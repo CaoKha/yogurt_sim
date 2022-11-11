@@ -1,15 +1,40 @@
 use gloo::console::log;
-use serde::Serialize;
+use yew::function_component;
 use yew::prelude::*;
 
 pub mod models;
-
+use models::MyObject;
 use models::Video;
+use models::VideosDetailsProps;
+use models::VideosListProps;
 
-#[derive(Serialize)]
-struct MyObject {
-    username: String,
-    favorite_language: String,
+#[function_component(VideosList)]
+fn videos_list(VideosListProps { videos, on_click }: &VideosListProps) -> Html {
+    let on_click = on_click.clone();
+    videos
+        .iter()
+        .map(|video| {
+            let on_video_select = {
+                let on_click = on_click.clone();
+                let video = video.clone();
+                Callback::from(move |_| on_click.emit(video.clone()))
+            };
+
+            html! {
+                <p onclick={on_video_select}>{format!("{}: {}", video.speaker, video.title)}</p>
+            }
+        })
+        .collect()
+}
+
+#[function_component(VideoDetails)]
+fn video_details(VideosDetailsProps { video }: &VideosDetailsProps) -> Html {
+    html! {
+        <div>
+            <h3>{ video.title.clone() }</h3>
+            <img src="https://via.placeholder.com/640x360.png?text=Video+Player+Placeholder" alt="video thumbnail" />
+        </div>
+    }
 }
 
 #[function_component(App)]
@@ -40,14 +65,16 @@ pub fn app() -> Html {
             url: "https://youtu.be/PsaFVLr8t4E".to_string(),
         },
     ];
-    let videos = videos
-        .iter()
-        .map(|video| {
-            html! {
-                <li>{format!("{}: {}", video.speaker, video.title)}</li>
-            }
-        })
-        .collect::<Html>();
+    let selected_video = use_state(|| None);
+    let on_video_select = {
+        let selected_video = selected_video.clone();
+        Callback::from(move |video: Video| selected_video.set(Some(video)))
+    };
+    let details = selected_video.as_ref().map(|video| {
+        html! {
+            <VideoDetails video={video.clone()} />
+        }
+    });
     let name: &str = "Brooks";
     let my_obj: MyObject = MyObject {
         username: name.to_owned(),
@@ -68,13 +95,17 @@ pub fn app() -> Html {
                 <p>{m}</p>
             } else {<p>{"message not found"}</p>}
             <ul>
-                {tasks.iter().map(|task| html!{<li>{task}</li>}).collect::<Html>()}
+                {list_to_html(tasks)}
             </ul>
             <p>
                 {my_obj.username}
             </p>
-            <ul>{videos}</ul>
-
+            <VideosList videos={videos} on_click={on_video_select}/>
+            {for details}  
         </>
     }
+}
+
+fn list_to_html(list: Vec<&str>) -> Vec<Html> {
+    list.iter().map(|item| html! {<li>{item}</li>}).collect()
 }
