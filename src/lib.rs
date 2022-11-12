@@ -1,40 +1,17 @@
 use gloo::console::log;
+use serde::Serialize;
 use yew::function_component;
 use yew::prelude::*;
 
-pub mod models;
-use models::MyObject;
-use models::Video;
-use models::VideosDetailsProps;
-use models::VideosListProps;
+mod components;
+use components::videos::Video;
+use components::videos::VideosList;
+use components::videos::VideoDetails;
 
-#[function_component(VideosList)]
-fn videos_list(VideosListProps { videos, on_click }: &VideosListProps) -> Html {
-    let on_click = on_click.clone();
-    videos
-        .iter()
-        .map(|video| {
-            let on_video_select = {
-                let on_click = on_click.clone();
-                let video = video.clone();
-                Callback::from(move |_| on_click.emit(video.clone()))
-            };
-
-            html! {
-                <p onclick={on_video_select}>{format!("{}: {}", video.speaker, video.title)}</p>
-            }
-        })
-        .collect()
-}
-
-#[function_component(VideoDetails)]
-fn video_details(VideosDetailsProps { video }: &VideosDetailsProps) -> Html {
-    html! {
-        <div>
-            <h3>{ video.title.clone() }</h3>
-            <img src="https://via.placeholder.com/640x360.png?text=Video+Player+Placeholder" alt="video thumbnail" />
-        </div>
-    }
+#[derive(Serialize)]
+struct MyObject {
+    pub username: String,
+    pub favorite_language: String,
 }
 
 #[function_component(App)]
@@ -101,7 +78,7 @@ pub fn app() -> Html {
                 {my_obj.username}
             </p>
             <VideosList videos={videos} on_click={on_video_select}/>
-            {for details}  
+            {for details}
         </>
     }
 }
