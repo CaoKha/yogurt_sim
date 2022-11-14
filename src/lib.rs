@@ -4,9 +4,11 @@ use yew::function_component;
 use yew::prelude::*;
 
 mod components;
-use components::videos::Video;
-use components::videos::VideosList;
-use components::videos::VideoDetails;
+use components::forms::button::CustomButton;
+use components::forms::text_input::CustomTextInput;
+use components::videos::layouts::Video;
+use components::videos::layouts::VideosList;
+use components::videos::layouts::{Color, VideoDetails};
 
 #[derive(Serialize)]
 struct MyObject {
@@ -16,6 +18,7 @@ struct MyObject {
 
 #[function_component(App)]
 pub fn app() -> Html {
+    let is_loaded = Callback::from(move |message: String| log!(message));
     let videos = vec![
         Video {
             id: 1,
@@ -49,7 +52,7 @@ pub fn app() -> Html {
     };
     let details = selected_video.as_ref().map(|video| {
         html! {
-            <VideoDetails video={video.clone()} />
+            <VideoDetails video={video.clone()} color={Color::Error} on_load={is_loaded}/>
         }
     });
     let name: &str = "Brooks";
@@ -58,8 +61,8 @@ pub fn app() -> Html {
         favorite_language: "Rust".to_string(),
     };
 
-    log!(serde_json::to_string_pretty(&my_obj).unwrap());
-    log!(name);
+    // log!(serde_json::to_string_pretty(&my_obj).unwrap());
+    // log!(name);
     let class: &str = "my_title";
     let message: Option<&str> = None;
     let tasks: Vec<&str> = vec!["record video", "grocery shopping", "pet"];
@@ -79,6 +82,10 @@ pub fn app() -> Html {
             </p>
             <VideosList videos={videos} on_click={on_video_select}/>
             {for details}
+            <form>
+                <CustomTextInput name="username" />
+                <CustomButton label="Submit" />
+            </form>
         </>
     }
 }
