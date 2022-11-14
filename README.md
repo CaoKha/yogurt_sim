@@ -1,3 +1,4 @@
 # YogurtSim
 A yogurt simulation
-![ohaio](https://giphy.com/embed/TFeB4I5IVewQCZCJij)
+
+![ohaio](https://media.tenor.com/G78em4XTdjwAAAAd/yogurt.gif)
