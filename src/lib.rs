@@ -66,6 +66,9 @@ pub fn app() -> Html {
     let class: &str = "my_title";
     let message: Option<&str> = None;
     let tasks: Vec<&str> = vec!["record video", "grocery shopping", "pet"];
+    let username_state = use_state(|| "Leonardo".to_owned());
+    let username_cloned = username_state.clone();
+    let username_change = Callback::from(move |username: String| username_cloned.set(username));
     html! {
         <>
             <h1 class={class}>{"Hello world!!"}</h1>
@@ -82,10 +85,9 @@ pub fn app() -> Html {
             </p>
             <VideosList videos={videos} on_click={on_video_select}/>
             {for details}
-            <form>
-                <CustomTextInput name="username" />
-                <CustomButton label="Submit" />
-            </form>
+            <CustomTextInput name="username" on_username_change={username_change} />
+            <p>{"Username: "}{&*username_state}</p>
+            <CustomButton label="Submit" />
         </>
     }
 }
