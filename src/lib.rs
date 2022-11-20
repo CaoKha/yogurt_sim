@@ -4,11 +4,10 @@ use yew::function_component;
 use yew::prelude::*;
 
 mod components;
-use components::forms::button::CustomButton;
-use components::forms::text_input::CustomTextInput;
-use components::videos::layouts::Video;
-use components::videos::layouts::VideosList;
-use components::videos::layouts::{Color, VideoDetails};
+use components::videos::videos::Video;
+use components::videos::videos::VideosList;
+use components::videos::videos::{Color, VideoDetails};
+use components::forms::form::CustomForm;
 
 #[derive(Serialize)]
 struct MyObject {
@@ -66,9 +65,6 @@ pub fn app() -> Html {
     let class: &str = "my_title";
     let message: Option<&str> = None;
     let tasks: Vec<&str> = vec!["record video", "grocery shopping", "pet"];
-    let username_state = use_state(|| "Leonardo".to_owned());
-    let username_cloned = username_state.clone();
-    let username_change = Callback::from(move |username: String| username_cloned.set(username));
     html! {
         <>
             <h1 class={class}>{"Hello world!!"}</h1>
@@ -85,9 +81,7 @@ pub fn app() -> Html {
             </p>
             <VideosList videos={videos} on_click={on_video_select}/>
             {for details}
-            <CustomTextInput name="username" on_username_change={username_change} />
-            <p>{"Username: "}{&*username_state}</p>
-            <CustomButton label="Submit" />
+            <CustomForm />
         </>
     }
 }

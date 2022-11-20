@@ -1,4 +1,4 @@
-use gloo::console::log;
+// use gloo::console::log;
 use wasm_bindgen::JsCast;
 use web_sys::HtmlInputElement;
 use yew::prelude::*;
@@ -10,7 +10,7 @@ pub struct TextInputProps {
 }
 
 #[function_component(CustomTextInput)]
-pub fn text_input(
+pub fn custom_text_input(
     TextInputProps {
         name,
         on_username_change,

@@ -2,7 +2,7 @@ use stylist::{yew::styled_component, Style};
 use yew::function_component;
 use yew::prelude::*;
 
-const STYLE_FILE: &str = include_str!("layouts.css");
+const STYLE_FILE: &str = include_str!("videos.css");
 
 #[derive(Clone, PartialEq)]
 pub struct Video {
