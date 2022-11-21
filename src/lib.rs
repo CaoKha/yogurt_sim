@@ -8,6 +8,8 @@ use components::videos::videos::Video;
 use components::videos::videos::VideosList;
 use components::videos::videos::{Color, VideoDetails};
 use components::forms::form::CustomForm;
+mod hooks;
+use hooks::store::StoreProvider;
 
 #[derive(Serialize)]
 struct MyObject {
@@ -66,7 +68,7 @@ pub fn app() -> Html {
     let message: Option<&str> = None;
     let tasks: Vec<&str> = vec!["record video", "grocery shopping", "pet"];
     html! {
-        <>
+        <StoreProvider>
             <h1 class={class}>{"Hello world!!"}</h1>
             if class == "my_title" {<p>{"Hi there!"}</p>}
             else {<p>{"I'm not a titles"}</p>}
@@ -82,7 +84,7 @@ pub fn app() -> Html {
             <VideosList videos={videos} on_click={on_video_select}/>
             {for details}
             <CustomForm />
-        </>
+        </StoreProvider>
     }
 }
 

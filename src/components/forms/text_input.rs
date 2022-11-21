@@ -16,16 +16,17 @@ pub fn custom_text_input(
         on_username_change,
     }: &TextInputProps,
 ) -> Html {
-    let handle_change = on_username_change.clone();
-    let onchange = Callback::from(move |event: Event| {
-        let value = event
-            .target()
-            .unwrap()
-            .unchecked_into::<HtmlInputElement>()
-            .value();
-        handle_change.emit(value);
-        // log!(value);
-    });
+    let onchange = {
+        let handle_change = on_username_change.clone();
+        Callback::from(move |event: Event| {
+            let value = event
+                .target()
+                .unwrap()
+                .unchecked_into::<HtmlInputElement>()
+                .value();
+            handle_change.emit(value);
+        })
+    };
     html! {
         <>
         <input type="text" name={name.clone()} onchange={onchange}/>
