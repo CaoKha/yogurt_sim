@@ -1,5 +1,5 @@
-use yogurt_sim::App;
+use YogurtSim::run;
 
 fn main() {
-    yew::start_app::<App>();
+    run();
 }

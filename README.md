@@ -1,2 +1,8 @@
 # YogurtSim
-A yogurt simulation
+
+## Requirements
+
+Ubuntu
+```
+cmake, wasm-pack, libfontconfig1-dev 
+```
