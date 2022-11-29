@@ -32,7 +32,7 @@ npm init wasm-app server
 
 Go to `server/` and install all local pakages inside pakage.json
 ```bash
-cd server/
+cd server
 npm install 
 ```
 
