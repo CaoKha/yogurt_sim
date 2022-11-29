@@ -1,10 +1,10 @@
 # TLDR
 
-Clone and run this command to generate pkg file 
+Clone and run this command to generate `pkg/` folder 
 ```bash
 wasm-pack build 
 ```
-Install nvm for node version pakage management
+Install `nvm` for node version pakage management
 ```bash
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
 ```
@@ -19,13 +19,13 @@ Apply the new `.bashrc` or `.zshrc`
 source ~/.bashrc 
 ```
 
-Use nodev16
+Use node v16
 ```bash
 nvm install --lts=gallium
 nvm use --lts=gallium
 ```
 
-Create a `www/` folder (wasm-app is a module like create-react-app)
+Create a `www/` folder (wasm-app is a module like create-react-app module)
 ```bash
 npm init wasm-app www 
 ```
