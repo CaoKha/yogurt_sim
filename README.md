@@ -25,14 +25,14 @@ nvm install --lts=gallium
 nvm use --lts=gallium
 ```
 
-Create a `www/` folder (wasm-app is a module like create-react-app module)
+Create a `server/` folder (wasm-app is a module like create-react-app module)
 ```bash
-npm init wasm-app www 
+npm init wasm-app server 
 ```
 
-Go to `www/` and install all local pakages inside pakage.json
+Go to `server/` and install all local pakages inside pakage.json
 ```bash
-cd www/
+cd server/
 npm install 
 ```
 
