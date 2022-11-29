@@ -1,3 +1,46 @@
+# TLDR
+
+Clone and run this command to generate pkg file 
+```bash
+wasm-pack build 
+```
+Install nvm for node version pakage management
+```bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
+```
+
+Add this to `.zshrc`, or `.bashrc`
+```bash
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+```
+Apply the new `.bashrc` or `.zshrc`
+```bash
+source ~/.bashrc 
+```
+
+Use nodev16
+```bash
+nvm install --lts=gallium
+nvm use --lts=gallium
+```
+
+Create a `www/` folder (wasm-app is a module like create-react-app)
+```bash
+npm init wasm-app www 
+```
+
+Go to `www/` and install all local pakages inside pakage.json
+```bash
+cd www/
+npm install 
+```
+
+Open a node server at local (run start script in pakage.json)
+```
+npm run start
+```
+
 <div align="center">
 
   <h1><code>wasm-pack-template</code></h1>
