@@ -3,8 +3,8 @@ import { memory } from "yogurt-sim/yogurt_sim_bg.wasm";
 
 const CELL_SIZE = 5; //px
 const GRID_COLOR = "#CCCCCC";
-const DEAD_COLOR = "#FFFFFF";
-const ALIVE_COLOR = "#000000";
+const DEAD_COLOR = "#000000"; // black
+const ALIVE_COLOR = "#FFFFFF"; // white
 
 const universe = Universe.new(100, 100);
 const width = universe.width();
@@ -57,8 +57,8 @@ const drawCells = () => {
       const idx = getIndex(row, col);
 
       ctx.fillStyle = bitIsSet(idx, cells)
-        ? DEAD_COLOR
-        : ALIVE_COLOR;
+        ? ALIVE_COLOR
+        : DEAD_COLOR;
 
       ctx.fillRect(
         col * (CELL_SIZE + 1) + 1,
