@@ -1,25 +1,12 @@
 mod utils;
-use wasm_bindgen::prelude::*;
 use fixedbitset::FixedBitSet;
+use wasm_bindgen::prelude::*;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
 #[cfg(feature = "wee_alloc")]
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
-
-#[wasm_bindgen]
-extern "C" {
-    fn alert(s: &str);
-}
-
-#[wasm_bindgen]
-#[repr(u8)]
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum Cell {
-    Dead = 0,
-    Alive = 1,
-}
 
 #[wasm_bindgen]
 pub struct Universe {
@@ -63,7 +50,6 @@ impl Universe {
     }
 
     pub fn tick(&mut self) {
-        let mut next = self.cells.clone();
 
         for row in 0..self.height {
             for col in 0..self.width {
@@ -71,7 +57,7 @@ impl Universe {
                 let cell = self.cells[idx];
                 let live_neighbors = self.live_neighbor_count(row, col);
 
-                next.set(
+                self.cells.set(
                     idx,
                     match (cell, live_neighbors) {
                         (true, x) if x < 2 => false,
@@ -83,7 +69,6 @@ impl Universe {
                 );
             }
         }
-        self.cells = next;
     }
 
     pub fn new(u_height: u32, u_width: u32) -> Universe {
@@ -91,6 +76,7 @@ impl Universe {
         let height = u_width;
 
         let size = (width * height) as usize;
+        // init a cells
         let mut cells = FixedBitSet::with_capacity(size);
 
         for i in 0..size {

@@ -1,5 +1,5 @@
-import { Universe, Cell } from "yogurt-sim";
-import { memory } from "yogurt-sim/yogurt_sim_bg";
+import { Universe } from "yogurt-sim";
+import { memory } from "yogurt-sim/yogurt_sim_bg.wasm";
 
 const CELL_SIZE = 5; //px
 const GRID_COLOR = "#CCCCCC";
@@ -37,6 +37,7 @@ const drawGrid = () => {
     ctx.lineTo(i * (CELL_SIZE + 1) + 1, (CELL_SIZE + 1) * height);
   }
 
+  // Horizontal line
   for (let j = 0; j <= height; j++) {
     ctx.moveTo(0, j * (CELL_SIZE + 1) + 1);
     ctx.lineTo((CELL_SIZE + 1) * width + 1, j * (CELL_SIZE + 1) + 1);
