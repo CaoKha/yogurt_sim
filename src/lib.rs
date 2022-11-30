@@ -50,14 +50,14 @@ impl Universe {
     }
 
     pub fn tick(&mut self) {
-
+        let mut next = self.cells.clone();
         for row in 0..self.height {
             for col in 0..self.width {
                 let idx = self.get_index(row, col);
                 let cell = self.cells[idx];
                 let live_neighbors = self.live_neighbor_count(row, col);
 
-                self.cells.set(
+                next.set(
                     idx,
                     match (cell, live_neighbors) {
                         (true, x) if x < 2 => false,
@@ -69,6 +69,7 @@ impl Universe {
                 );
             }
         }
+        self.cells = next;
     }
 
     pub fn new(u_height: u32, u_width: u32) -> Universe {
