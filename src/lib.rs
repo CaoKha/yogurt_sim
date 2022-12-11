@@ -34,18 +34,21 @@ impl Universe {
     }
 
     fn live_neighbor_count(&self, row: u32, column: u32) -> u8 {
+        let row_above = (row + self.width - 1) % self.width;
+        let row_below = (row + 1) % self.width;
+        let column_left = (column + self.height - 1) % self.height;
+        let column_right = (column + 1) % self.height;
+
         let mut count = 0;
-        for delta_row in [self.height - 1, 0, 1].iter().cloned() {
-            for delta_col in [self.width - 1, 0, 1].iter().cloned() {
-                if delta_row == 0 && delta_col == 0 {
-                    continue;
-                }
-                let neighbor_row = (row + delta_row) % self.height;
-                let neighbor_col = (column + delta_col) % self.width;
-                let idx = self.get_index(neighbor_row, neighbor_col);
-                count += self.cells[idx] as u8;
-            }
-        }
+        count += self.cells[self.get_index(row, column_left)] as u8;
+        count += self.cells[self.get_index(row, column_right)] as u8;
+        count += self.cells[self.get_index(row_above, column_left)] as u8;
+        count += self.cells[self.get_index(row_above, column)] as u8;
+        count += self.cells[self.get_index(row_above, column_right)] as u8;
+        count += self.cells[self.get_index(row_below, column_left)] as u8;
+        count += self.cells[self.get_index(row_below, column)] as u8;
+        count += self.cells[self.get_index(row_below, column_right)] as u8;
+
         count
     }
 
