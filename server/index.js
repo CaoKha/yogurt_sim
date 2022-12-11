@@ -6,7 +6,7 @@ const GRID_COLOR = "#CCCCCC";
 const DEAD_COLOR = "#000000"; // black
 const ALIVE_COLOR = "#FFFFFF"; // white
 
-const universe = Universe.new(100, 100);
+const universe = Universe.new(50, 50);
 const width = universe.width();
 const height = universe.height();
 
@@ -48,7 +48,7 @@ const drawGrid = () => {
 
 const drawCells = () => {
   const cellsPtr = universe.cells();
-  const cells = new Uint8Array(memory.buffer, cellsPtr, width * height/8);
+  const cells = new Uint8Array(memory.buffer, cellsPtr, width * height / 8);
 
   ctx.beginPath();
 
@@ -71,17 +71,49 @@ const drawCells = () => {
 
   ctx.stroke();
 }
-// this is an infinite loop
+
+let animationId = null;
+
+const isPaused = () => {
+  return animationId === null;
+}
+
+const playPauseButton = document.getElementById("play-pause");
+
+const play = () => {
+  playPauseButton.textContent = "⏸";
+  renderLoop();
+};
+
+const pause = () => {
+  playPauseButton.textContent = "▶";
+  cancelAnimationFrame(animationId);
+  animationId = null;
+};
+
+playPauseButton.addEventListener("click", event => {
+  if (isPaused()) {
+    play();
+  } else {
+    pause();
+  }
+});
+
+// This function is the same as before, except the
+// result of `requestAnimationFrame` is assigned to
+// `animationId`.
 const renderLoop = () => {
-  universe.tick();
   drawGrid();
   drawCells();
 
-  requestAnimationFrame(renderLoop);
+  universe.tick();
+
+  animationId = requestAnimationFrame(renderLoop);
 };
+
 
 
 drawGrid();
 drawCells();
-requestAnimationFrame(renderLoop);
+play()
 
