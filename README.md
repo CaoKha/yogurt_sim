@@ -41,6 +41,16 @@ Open a node server at local (run start script in pakage.json)
 npm run start
 ```
 
+## Benchmark
+
+The rust code can be benchmarked by running:
+
+```
+cargo bench
+```
+
+However, this requires nightly rustc compiler.
+
 <div align="center">
 
   <h1><code>wasm-pack-template</code></h1>
