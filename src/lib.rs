@@ -81,7 +81,7 @@ impl Universe {
         let mut cells = FixedBitSet::with_capacity(size);
 
         for i in 0..size {
-            cells.set(i, js_sys::Math::random() < 0.5);
+            cells.set(i, rand::random());
         }
 
         Universe {
