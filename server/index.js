@@ -3,10 +3,10 @@ import { memory } from "yogurt-sim/yogurt_sim_bg.wasm";
 
 const CELL_SIZE = 5; //px
 const GRID_COLOR = "#CCCCCC";
-const DEAD_COLOR = "#000000"; // black
-const ALIVE_COLOR = "#FFFFFF"; // white
+const ALIVE_COLOR = "#000000"; // black
+const DEAD_COLOR = "#FFFFFF"; // white
 
-const universe = Universe.new(50, 50);
+const universe = Universe.new(64, 64);
 const width = universe.width();
 const height = universe.height();
 
