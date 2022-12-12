@@ -40,11 +40,11 @@ impl Universe {
         let column_right = (column + 1) % self.height;
 
         let mut count = 0;
-        count += self.cells[self.get_index(row, column_left)] as u8;
-        count += self.cells[self.get_index(row, column_right)] as u8;
         count += self.cells[self.get_index(row_above, column_left)] as u8;
         count += self.cells[self.get_index(row_above, column)] as u8;
         count += self.cells[self.get_index(row_above, column_right)] as u8;
+        count += self.cells[self.get_index(row, column_left)] as u8;
+        count += self.cells[self.get_index(row, column_right)] as u8;
         count += self.cells[self.get_index(row_below, column_left)] as u8;
         count += self.cells[self.get_index(row_below, column)] as u8;
         count += self.cells[self.get_index(row_below, column_right)] as u8;
