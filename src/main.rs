@@ -2,5 +2,5 @@
 use YogurtSim::run;
 
 fn main() {
-    run();
+    pollster::block_on(run());
 }
