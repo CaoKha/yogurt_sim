@@ -59,7 +59,21 @@ impl State {
 
     pub fn input(&mut self, event: &WindowEvent) -> bool {
         match event {
+            &WindowEvent::KeyboardInput {
+                // Challenge tutorial Pipeline
+                input:
+                    KeyboardInput {
+                        state: ElementState::Pressed,
+                        virtual_keycode: Some(VirtualKeyCode::Space),
+                        ..
+                    },
+                ..
+            } => {
+                self.render_pipeline.swap_pipeline();
+                true
+            }
             &WindowEvent::CursorMoved {
+                // Challenge tutorial Surface
                 position: winit::dpi::PhysicalPosition { x, y },
                 ..
             } => {
