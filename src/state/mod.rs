@@ -1,7 +1,10 @@
 use winit::{event::*, window::Window};
 
-mod init_utils;
-use init_utils::{init_config, init_device, init_surface, init_vertex_buffer};
+mod surface;
+use surface::{init_config, init_device, init_surface};
+
+mod buffer;
+use buffer::init_vertex_buffer;
 
 mod render_pipeline;
 use render_pipeline::*;
@@ -9,19 +12,11 @@ use render_pipeline::*;
 mod vertex;
 use vertex::Vertex;
 
+#[rustfmt::skip]
 const VERTICES: &[Vertex] = &[
-    Vertex {
-        position: [0.0, 0.5, 0.0],
-        color: [1.0, 0.0, 0.0],
-    },
-    Vertex {
-        position: [-0.5, -0.5, 0.0],
-        color: [0.0, 1.0, 0.0],
-    },
-    Vertex {
-        position: [0.5, -0.5, 0.0],
-        color: [0.0, 0.0, 1.0],
-    },
+    Vertex { position: [0.0, 0.5, 0.0], color: [1.0, 0.0, 0.0] },
+    Vertex { position: [-0.5, -0.5, 0.0], color: [0.0, 1.0, 0.0] },
+    Vertex { position: [0.5, -0.5, 0.0], color: [0.0, 0.0, 1.0] },
 ];
 
 pub struct State {

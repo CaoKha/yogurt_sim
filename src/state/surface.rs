@@ -1,5 +1,3 @@
-use wgpu::util::DeviceExt;
-
 pub async fn init_surface(window: &winit::window::Window) -> (wgpu::Surface, wgpu::Adapter) {
     // the instance is a handle to our GPU
     // Backends::all => Vulkan + Metal + DX12 + Browser WebGPUÒ
@@ -49,15 +47,4 @@ pub fn init_config(
         present_mode: wgpu::PresentMode::Fifo,
         alpha_mode: wgpu::CompositeAlphaMode::Auto,
     }
-}
-
-pub fn init_vertex_buffer(
-    device: &wgpu::Device,
-    vertices: &[super::vertex::Vertex],
-) -> wgpu::Buffer {
-    device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-        label: Some("Vertex Buffer"),
-        contents: bytemuck::cast_slice(vertices),
-        usage: wgpu::BufferUsages::VERTEX,
-    })
 }
