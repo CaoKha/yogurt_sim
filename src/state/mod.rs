@@ -1,10 +1,28 @@
 use winit::{event::*, window::Window};
 
 mod init_utils;
-use init_utils::{init_config, init_device, init_surface};
+use init_utils::{init_config, init_device, init_surface, init_vertex_buffer};
 
 mod render_pipeline;
 use render_pipeline::*;
+
+mod vertex;
+use vertex::Vertex;
+
+const VERTICES: &[Vertex] = &[
+    Vertex {
+        position: [0.0, 0.5, 0.0],
+        color: [1.0, 0.0, 0.0],
+    },
+    Vertex {
+        position: [-0.5, -0.5, 0.0],
+        color: [0.0, 1.0, 0.0],
+    },
+    Vertex {
+        position: [0.5, -0.5, 0.0],
+        color: [0.0, 0.0, 1.0],
+    },
+];
 
 pub struct State {
     surface: wgpu::Surface,
@@ -16,6 +34,9 @@ pub struct State {
     clear_color: wgpu::Color, // Challenge tutorial Surface
 
     render_pipeline: RenderPipeline,
+
+    vertex_buffer: wgpu::Buffer,
+    num_vertices: u32,
 }
 
 impl State {
@@ -33,6 +54,9 @@ impl State {
 
         let clear_color = wgpu::Color::BLACK;
 
+        let vertex_buffer = init_vertex_buffer(&device, VERTICES);
+        let num_vertices = VERTICES.len() as u32;
+
         Self {
             surface,
             device,
@@ -41,6 +65,8 @@ impl State {
             size,
             clear_color,
             render_pipeline,
+            vertex_buffer,
+            num_vertices,
         }
     }
 
@@ -104,8 +130,13 @@ impl State {
                 label: Some("Render Encoder"),
             });
 
-        self.render_pipeline
-            .add_render_pass(&mut encoder, &view, self.clear_color);
+        self.render_pipeline.add_render_pass(
+            &mut encoder,
+            &view,
+            self.clear_color,
+            &self.vertex_buffer,
+            self.num_vertices,
+        );
 
         // submit will accept anything that implements IntoIter
         self.queue.submit(std::iter::once(encoder.finish()));
