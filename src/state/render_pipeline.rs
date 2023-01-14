@@ -34,6 +34,8 @@ impl RenderPipeline {
         color: wgpu::Color,
         vertex_buffer: &wgpu::Buffer,
         num_vertices: u32,
+        index_buffer: &wgpu::Buffer,
+        num_indices: u32,
     ) {
         let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
             label: Some("Render Pass"),
@@ -55,8 +57,10 @@ impl RenderPipeline {
         });
 
         render_pass.set_vertex_buffer(0, vertex_buffer.slice(..));
+        render_pass.set_index_buffer(index_buffer.slice(..), wgpu::IndexFormat::Uint16);
 
         render_pass.draw(0..num_vertices, 0..1);
+        render_pass.draw_indexed(0..num_indices, 0, 0..1);
     }
 }
 
