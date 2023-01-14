@@ -1,3 +1,4 @@
+use super::buffer;
 use super::vertex::Vertex;
 
 pub struct RenderPipeline {
@@ -32,10 +33,8 @@ impl RenderPipeline {
         encoder: &mut wgpu::CommandEncoder,
         view: &wgpu::TextureView,
         color: wgpu::Color,
-        vertex_buffer: &wgpu::Buffer,
-        num_vertices: u32,
-        index_buffer: &wgpu::Buffer,
-        num_indices: u32,
+        vertex_buffer: &buffer::Buffer,
+        index_buffer: &Option<buffer::Buffer>,
     ) {
         let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
             label: Some("Render Pass"),
@@ -56,11 +55,14 @@ impl RenderPipeline {
             &self.render_pipeline
         });
 
-        render_pass.set_vertex_buffer(0, vertex_buffer.slice(..));
-        render_pass.set_index_buffer(index_buffer.slice(..), wgpu::IndexFormat::Uint16);
+        render_pass.set_vertex_buffer(0, vertex_buffer.buffer.slice(..));
 
-        render_pass.draw(0..num_vertices, 0..1);
-        render_pass.draw_indexed(0..num_indices, 0, 0..1);
+        if let Some(index_buffer) = index_buffer {
+            render_pass.set_index_buffer(index_buffer.buffer.slice(..), wgpu::IndexFormat::Uint16);
+            index_buffer.drawn_on(&mut render_pass);
+        } else {
+            vertex_buffer.drawn_on(&mut render_pass);
+        }
     }
 }
 

@@ -1,18 +1,44 @@
-use super::vertex;
 use wgpu::util::DeviceExt;
 
-pub fn init_vertex_buffer(device: &wgpu::Device, vertices: &[vertex::Vertex]) -> wgpu::Buffer {
-    device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-        label: Some("Vertex Buffer"),
-        contents: bytemuck::cast_slice(vertices),
-        usage: wgpu::BufferUsages::VERTEX,
-    })
+pub struct Buffer {
+    pub buffer: wgpu::Buffer,
+    usage: wgpu::BufferUsages,
+    size: u32,
 }
 
-pub fn init_index_buffer(device: &wgpu::Device, indices: &[u16]) -> wgpu::Buffer {
-    device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-        label: Some("Index Buffer"),
-        contents: bytemuck::cast_slice(indices),
-        usage: wgpu::BufferUsages::INDEX,
-    })
+impl Buffer {
+    pub fn new<T: bytemuck::NoUninit>(
+        device: &wgpu::Device,
+        data: &[T],
+        usage: wgpu::BufferUsages,
+        name: &str,
+    ) -> Self {
+        let buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: Some(name),
+            contents: bytemuck::cast_slice(data),
+            usage: usage,
+        });
+
+        let size = data.len() as u32;
+
+        Self {
+            buffer,
+            usage,
+            size,
+        }
+    }
+
+    pub fn drawn_on(&self, render_pass: &mut wgpu::RenderPass) {
+        match self.usage {
+            wgpu::BufferUsages::VERTEX => {
+                render_pass.draw(0..self.size, 0..1);
+            }
+            wgpu::BufferUsages::INDEX => {
+                render_pass.draw_indexed(0..self.size, 0, 0..1);
+            }
+            _ => {
+                format!("Unimplemented usage: {:?}", self.usage);
+            }
+        };
+    }
 }

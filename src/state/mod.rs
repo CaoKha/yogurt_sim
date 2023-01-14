@@ -4,7 +4,7 @@ mod surface;
 use surface::{init_config, init_device, init_surface};
 
 mod buffer;
-use buffer::{init_index_buffer, init_vertex_buffer};
+use buffer::Buffer;
 
 mod render_pipeline;
 use render_pipeline::*;
@@ -39,11 +39,8 @@ pub struct State {
 
     render_pipeline: RenderPipeline,
 
-    vertex_buffer: wgpu::Buffer,
-    num_vertices: u32,
-
-    index_buffer: wgpu::Buffer,
-    num_indices: u32,
+    vertex_buffer: Buffer,
+    index_buffer: Option<Buffer>,
 }
 
 impl State {
@@ -61,11 +58,10 @@ impl State {
 
         let clear_color = wgpu::Color::BLACK;
 
-        let vertex_buffer = init_vertex_buffer(&device, VERTICES);
-        let num_vertices = VERTICES.len() as u32;
-
-        let index_buffer = init_index_buffer(&device, INDICES);
-        let num_indices = INDICES.len() as u32;
+        #[rustfmt::skip]
+        let vertex_buffer = Buffer::new(&device, VERTICES, wgpu::BufferUsages::VERTEX, "Vertex buffer");
+        #[rustfmt::skip]
+        let index_buffer = Some(Buffer::new(&device, INDICES, wgpu::BufferUsages::INDEX, "Index Buffer"));
 
         Self {
             surface,
@@ -76,9 +72,7 @@ impl State {
             clear_color,
             render_pipeline,
             vertex_buffer,
-            num_vertices,
             index_buffer,
-            num_indices,
         }
     }
 
@@ -147,9 +141,7 @@ impl State {
             &view,
             self.clear_color,
             &self.vertex_buffer,
-            self.num_vertices,
             &self.index_buffer,
-            self.num_indices,
         );
 
         // submit will accept anything that implements IntoIter
