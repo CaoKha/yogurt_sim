@@ -9,12 +9,29 @@ pub struct RenderPipeline {
 }
 
 impl RenderPipeline {
-    pub fn new(device: &wgpu::Device, config: &wgpu::SurfaceConfiguration) -> Self {
+    pub fn new(
+        device: &wgpu::Device,
+        config: &wgpu::SurfaceConfiguration,
+        bind_group_layouts: &[&wgpu::BindGroupLayout],
+    ) -> Self {
         let shader = device.create_shader_module(wgpu::include_wgsl!("shader.wgsl"));
 
-        let render_pipeline = init_render_pipeline(&device, &config, &shader, "vs_main", "fs_main");
-        let alt_render_pipeline =
-            init_render_pipeline(&device, &config, &shader, "vs_main", "fs_main_alt");
+        let render_pipeline = init_render_pipeline(
+            &device,
+            &config,
+            &shader,
+            "vs_main",
+            "fs_main",
+            bind_group_layouts,
+        );
+        let alt_render_pipeline = init_render_pipeline(
+            &device,
+            &config,
+            &shader,
+            "vs_main",
+            "fs_main_alt",
+            bind_group_layouts,
+        );
         let use_alt = false;
 
         RenderPipeline {
@@ -35,6 +52,7 @@ impl RenderPipeline {
         color: wgpu::Color,
         vertex_buffer: &buffer::Buffer,
         index_buffer: &Option<buffer::Buffer>,
+        diffuse_bind_group: &wgpu::BindGroup,
     ) {
         let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
             label: Some("Render Pass"),
@@ -55,6 +73,8 @@ impl RenderPipeline {
             &self.render_pipeline
         });
 
+        render_pass.set_bind_group(0, diffuse_bind_group, &[]);
+
         render_pass.set_vertex_buffer(0, vertex_buffer.buffer.slice(..));
 
         if let Some(index_buffer) = index_buffer {
@@ -72,10 +92,11 @@ fn init_render_pipeline(
     shader: &wgpu::ShaderModule,
     vertex_entry_point: &str,
     fragment_entry_point: &str,
+    bind_group_layouts: &[&wgpu::BindGroupLayout],
 ) -> wgpu::RenderPipeline {
     let render_pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
         label: Some("Render Pipeline layout"),
-        bind_group_layouts: &[],
+        bind_group_layouts: bind_group_layouts,
         push_constant_ranges: &[],
     });
 
