@@ -154,10 +154,7 @@ impl State {
                         ..
                     },
                 ..
-            } => {
-                self.render_pipeline.swap_pipeline();
-                true
-            }
+            } => false,
             &WindowEvent::CursorMoved {
                 // Challenge tutorial Surface
                 position: winit::dpi::PhysicalPosition { x, y },

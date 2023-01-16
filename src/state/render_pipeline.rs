@@ -3,9 +3,6 @@ use super::vertex::Vertex;
 
 pub struct RenderPipeline {
     render_pipeline: wgpu::RenderPipeline,
-    // Challenge tutorial Pipeline
-    alt_render_pipeline: wgpu::RenderPipeline,
-    use_alt: bool,
 }
 
 impl RenderPipeline {
@@ -24,25 +21,8 @@ impl RenderPipeline {
             "fs_main",
             bind_group_layouts,
         );
-        let alt_render_pipeline = init_render_pipeline(
-            &device,
-            &config,
-            &shader,
-            "vs_main",
-            "fs_main_alt",
-            bind_group_layouts,
-        );
-        let use_alt = false;
 
-        RenderPipeline {
-            render_pipeline,
-            alt_render_pipeline,
-            use_alt,
-        }
-    }
-
-    pub fn swap_pipeline(&mut self) {
-        self.use_alt = !self.use_alt;
+        RenderPipeline { render_pipeline }
     }
 
     pub fn add_render_pass(
@@ -67,11 +47,7 @@ impl RenderPipeline {
             depth_stencil_attachment: None,
         });
 
-        render_pass.set_pipeline(if self.use_alt {
-            &self.alt_render_pipeline
-        } else {
-            &self.render_pipeline
-        });
+        render_pass.set_pipeline(&self.render_pipeline);
 
         render_pass.set_bind_group(0, diffuse_bind_group, &[]);
 
