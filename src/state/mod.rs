@@ -45,7 +45,9 @@ pub struct State {
     index_buffer: Option<Buffer>,
 
     diffuse_bind_group: wgpu::BindGroup, // NEW
+
     diffuse_texture: texture::Texture,
+    diffuse_texture_challenge: texture::Texture,
 }
 
 impl State {
@@ -83,6 +85,11 @@ impl State {
             label: Some("diffuse_bind_group"),
         });
 
+        let diffuse_bytes_challenge = include_bytes!("dog.png"); // CHANGED!
+        let diffuse_texture_challenge =
+            texture::Texture::from_bytes(&device, &queue, diffuse_bytes_challenge, "dog.png")
+                .unwrap(); // CHANGED!
+
         // END NEW
 
         let render_pipeline = RenderPipeline::new(&device, &config, &[&texture_bind_group_layout]);
@@ -106,6 +113,7 @@ impl State {
             index_buffer,
             diffuse_bind_group,
             diffuse_texture,
+            diffuse_texture_challenge,
         }
     }
 
@@ -133,7 +141,13 @@ impl State {
                         ..
                     },
                 ..
-            } => false,
+            } => {
+                std::mem::swap(
+                    &mut self.diffuse_texture,
+                    &mut self.diffuse_texture_challenge,
+                );
+                true
+            }
             &WindowEvent::CursorMoved {
                 // Challenge tutorial Surface
                 position: winit::dpi::PhysicalPosition { x, y },
@@ -165,6 +179,26 @@ impl State {
             .create_command_encoder(&wgpu::CommandEncoderDescriptor {
                 label: Some("Render Encoder"),
             });
+
+        let texture_bind_group_layout =
+            self.device
+                .create_bind_group_layout(&texture::Texture::bind_group_layout_descriptor(
+                    "texture_bind_group_layout",
+                ));
+        self.diffuse_bind_group = self.device.create_bind_group(&wgpu::BindGroupDescriptor {
+            layout: &texture_bind_group_layout,
+            entries: &[
+                wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: wgpu::BindingResource::TextureView(&self.diffuse_texture.view),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 1,
+                    resource: wgpu::BindingResource::Sampler(&self.diffuse_texture.sampler),
+                },
+            ],
+            label: Some("diffuse_bind_group"),
+        });
 
         self.render_pipeline.add_render_pass(
             &mut encoder,
