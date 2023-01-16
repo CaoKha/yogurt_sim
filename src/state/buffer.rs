@@ -2,7 +2,6 @@ use wgpu::util::DeviceExt;
 
 pub struct Buffer {
     pub buffer: wgpu::Buffer,
-    usage: wgpu::BufferUsages,
     size: u32,
 }
 
@@ -21,15 +20,12 @@ impl Buffer {
 
         let size = data.len() as u32;
 
-        Self {
-            buffer,
-            usage,
-            size,
-        }
+        Self { buffer, size }
     }
 
     pub fn drawn_on(&self, render_pass: &mut wgpu::RenderPass) {
-        match self.usage {
+        let usage = self.buffer.usage();
+        match usage {
             wgpu::BufferUsages::VERTEX => {
                 render_pass.draw(0..self.size, 0..1);
             }
@@ -37,7 +33,22 @@ impl Buffer {
                 render_pass.draw_indexed(0..self.size, 0, 0..1);
             }
             _ => {
-                format!("Unimplemented usage: {:?}", self.usage);
+                format!("Unimplemented drawn_on for usage: {:?}", usage);
+            }
+        };
+    }
+
+    pub fn attach_to<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
+        let usage = self.buffer.usage();
+        match usage {
+            wgpu::BufferUsages::VERTEX => {
+                render_pass.set_vertex_buffer(0, self.buffer.slice(..));
+            }
+            wgpu::BufferUsages::INDEX => {
+                render_pass.set_index_buffer(self.buffer.slice(..), wgpu::IndexFormat::Uint16);
+            }
+            _ => {
+                format!("Unimplemented attach_to for usage: {:?}", usage);
             }
         };
     }

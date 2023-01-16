@@ -51,10 +51,12 @@ impl RenderPipeline {
 
         render_pass.set_bind_group(0, diffuse_bind_group, &[]);
 
-        render_pass.set_vertex_buffer(0, vertex_buffer.buffer.slice(..));
+        vertex_buffer.attach_to(&mut render_pass);
+        if let Some(index_buffer) = index_buffer {
+            index_buffer.attach_to(&mut render_pass);
+        }
 
         if let Some(index_buffer) = index_buffer {
-            render_pass.set_index_buffer(index_buffer.buffer.slice(..), wgpu::IndexFormat::Uint16);
             index_buffer.drawn_on(&mut render_pass);
         } else {
             vertex_buffer.drawn_on(&mut render_pass);
