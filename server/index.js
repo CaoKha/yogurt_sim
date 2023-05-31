@@ -1,16 +1,16 @@
-import { Universe } from "yogurt-sim";
-import { memory } from "yogurt-sim/yogurt_sim_bg.wasm";
+import { Universe, Cell } from 'yogurt-sim';
+import { memory } from 'yogurt-sim/yogurt_sim_bg.wasm';
 
 const CELL_SIZE = 5; //px
-const GRID_COLOR = "#CCCCCC";
-const DEAD_COLOR = "#000000"; // black
-const ALIVE_COLOR = "#FFFFFF"; // white
+const GRID_COLOR = '#CCCCCC';
+const DEAD_COLOR = '#000000'; // black
+const ALIVE_COLOR = '#FFFFFF'; // white
 
 const universe = Universe.new(100, 100);
 const width = universe.width();
 const height = universe.height();
 
-const canvas = document.getElementById("game-of-life-canvas");
+const canvas = document.getElementById('game-of-life-canvas');
 canvas.height = (CELL_SIZE + 1) * height + 1;
 canvas.width = (CELL_SIZE + 1) * width + 1;
 
@@ -20,12 +20,11 @@ const getIndex = (row, column) => {
   return row * width + column;
 };
 
-const bitIsSet = (n, arr) => {
-  const byte = Math.floor(n / 8);
-  const mask = 1 << (n % 8);
-  return (arr[byte] & mask) === mask;
-};
-
+// const bitIsSet = (n, arr) => {
+//   const byte = Math.floor(n / 8);
+//   const mask = 1 << (n % 8);
+//   return (arr[byte] & mask) === mask;
+// };
 
 const drawGrid = () => {
   ctx.beginPath();
@@ -44,11 +43,11 @@ const drawGrid = () => {
   }
 
   ctx.stroke();
-}
+};
 
 const drawCells = () => {
   const cellsPtr = universe.cells();
-  const cells = new Uint8Array(memory.buffer, cellsPtr, width * height/8);
+  const cells = new Uint8Array(memory.buffer, cellsPtr, width * height);
 
   ctx.beginPath();
 
@@ -56,9 +55,7 @@ const drawCells = () => {
     for (let col = 0; col < width; col++) {
       const idx = getIndex(row, col);
 
-      ctx.fillStyle = bitIsSet(idx, cells)
-        ? ALIVE_COLOR
-        : DEAD_COLOR;
+      ctx.fillStyle = cells[idx] === Cell.Alive ? ALIVE_COLOR : DEAD_COLOR;
 
       ctx.fillRect(
         col * (CELL_SIZE + 1) + 1,
@@ -70,18 +67,46 @@ const drawCells = () => {
   }
 
   ctx.stroke();
-}
+};
+
+let animationId = null;
+
 // this is an infinite loop
 const renderLoop = () => {
+  // debugger;
   universe.tick();
   drawGrid();
   drawCells();
 
-  requestAnimationFrame(renderLoop);
+  animationId = requestAnimationFrame(renderLoop);
 };
 
+const isPaused = () => {
+  return animationId === null;
+};
+
+const playPauseButton = document.getElementById('play-pause');
+
+const play = () => {
+  playPauseButton.textContent = '⏸';
+  renderLoop();
+};
+
+const pause = () => {
+  playPauseButton.textContent = '▶';
+  cancelAnimationFrame(animationId);
+  animationId = null;
+};
+
+playPauseButton.addEventListener('click', (event) => {
+  if (isPaused()) {
+    play();
+  } else {
+    pause();
+  }
+});
 
 drawGrid();
 drawCells();
-requestAnimationFrame(renderLoop);
-
+// requestAnimationFrame(renderLoop);
+play();
