@@ -1,16 +1,11 @@
 "use client";
-import init, { run_bevy_app } from "yogurt-sim";
+import { init_bevy } from "@/wasm/init";
 
-init();
 export default function Home() {
-  const runBevyApp = async () => {
-    await init();
-    run_bevy_app();
-  };
-
   return (
     <div className="App">
-      <button onClick={runBevyApp}>Run Bevy App</button>
+      <button onClick={init_bevy}>Run Bevy App</button>
+      <canvas id="bevy_canvas"></canvas>
     </div>
   );
 }

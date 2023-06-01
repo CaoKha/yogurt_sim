@@ -25,6 +25,7 @@ console_error_panic_hook = { version = "0.1.7", optional = true }
 # allocator, however.
 wee_alloc = { version = "0.4.5", optional = true }
 bevy = {version = "0.10.1" }
+bevy_ecs = "0.10.1"
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.36"
