@@ -1,176 +1,182 @@
-mod utils;
+//! This example shows how to configure Physically Based Rendering (PBR) parameters.
+//!
 use wasm_bindgen::prelude::*;
+use bevy::{asset::LoadState, prelude::*};
 
-// When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
-// allocator.
-#[cfg(feature = "wee_alloc")]
-#[global_allocator]
-static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
-
-extern crate web_sys;
-// use web_sys::console::log_1;
-
-// macro_rules! log
-//     {
-//     ( $( $t:tt)* ) => {
-//         log_1(&format!( $( $t)* ).into());
-//     };
-// }
 
 #[wasm_bindgen]
-#[repr(u8)]
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum Cell {
-    Dead = 0,
-    Alive = 1,
+pub fn run_bevy_app() {
+    App::new()
+        .add_plugins(DefaultPlugins)
+        .add_startup_system(setup)
+        .add_system(environment_map_load_finish)
+        .run();
 }
 
-#[wasm_bindgen]
-pub struct Universe {
-    width: u32,
-    height: u32,
-    cells: Vec<Cell>,
-}
-
-#[wasm_bindgen]
-impl Universe {
-    pub fn width(&self) -> u32 {
-        self.width
-    }
-
-    pub fn height(&self) -> u32 {
-        self.height
-    }
-
-    pub fn set_width(&mut self, width: u32) {
-        self.width = width;
-        self.cells = (0..width * self.height).map(|_i| Cell::Dead).collect();
-    }
-
-    pub fn set_height(&mut self, height: u32) {
-        self.height = height;
-        self.cells = (0..self.width * height).map(|_i| Cell::Dead).collect();
-    }
-
-    pub fn cells(&self) -> *const Cell {
-        self.cells.as_ptr()
-    }
-
-    fn get_index(&self, row: u32, column: u32) -> usize {
-        (row * self.width + column) as usize
-    }
-
-    fn live_neighbor_count(&self, row: u32, column: u32) -> u8 {
-        let mut count = 0;
-        for delta_row in [self.height - 1, 0, 1].iter().cloned() {
-            for delta_col in [self.width - 1, 0, 1].iter().cloned() {
-                if delta_row == 0 && delta_col == 0 {
-                    continue;
-                }
-                let neighbor_row = (row + delta_row) % self.height;
-                let neighbor_col = (column + delta_col) % self.width;
-                let idx = self.get_index(neighbor_row, neighbor_col);
-                count += self.cells[idx] as u8;
-            }
+/// set up a simple 3D scene
+fn setup(
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+    asset_server: Res<AssetServer>,
+) {
+    // add entities to the world
+    for y in -2..=2 {
+        for x in -5..=5 {
+            let x01 = (x + 5) as f32 / 10.0;
+            let y01 = (y + 2) as f32 / 4.0;
+            // sphere
+            commands.spawn(PbrBundle {
+                mesh: meshes.add(
+                    Mesh::try_from(shape::Icosphere {
+                        radius: 0.45,
+                        subdivisions: 32,
+                    })
+                    .unwrap(),
+                ),
+                material: materials.add(StandardMaterial {
+                    base_color: Color::hex("#ffd891").unwrap(),
+                    // vary key PBR parameters on a grid of spheres to show the effect
+                    metallic: y01,
+                    perceptual_roughness: x01,
+                    ..default()
+                }),
+                transform: Transform::from_xyz(x as f32, y as f32 + 0.5, 0.0),
+                ..default()
+            });
         }
-        count
     }
-
-    pub fn tick(&mut self) {
-        let mut next = self.cells.clone();
-        for row in 0..self.height {
-            for col in 0..self.width {
-                let idx = self.get_index(row, col);
-                let cell = self.cells[idx];
-                let live_neighbors = self.live_neighbor_count(row, col);
-
-                // log!(
-                //     "cell[{},{}] is initially {:?} and has {} live neighbors",
-                //     row,
-                //     col,
-                //     cell,
-                //     live_neighbors
-                // );
-                let next_cell = match (cell, live_neighbors) {
-                    (Cell::Alive, x) if x < 2 => Cell::Dead,
-                    (Cell::Alive, 2) | (Cell::Alive, 3) => Cell::Alive,
-                    (Cell::Alive, x) if x > 3 => Cell::Dead,
-                    (Cell::Dead, 3) => Cell::Alive,
-                    (otherwise, _) => otherwise,
-                };
-                // log!(" it becomes {:?}", next_cell);
-                next[idx] = next_cell;
-            }
-        }
-        self.cells = next;
-    }
-
-    pub fn new(u_height: u32, u_width: u32) -> Universe {
-        utils::set_panic_hook();
-        let width = u_height;
-        let height = u_width;
-
-        let cells = (0..width * height)
-            .map(|_i| {
-                if js_sys::Math::random() < 0.5 {
-                    Cell::Alive
-                } else {
-                    Cell::Dead
-                }
+    // unlit sphere
+    commands.spawn(PbrBundle {
+        mesh: meshes.add(
+            Mesh::try_from(shape::Icosphere {
+                radius: 0.45,
+                subdivisions: 32,
             })
-            .collect();
+            .unwrap(),
+        ),
+        material: materials.add(StandardMaterial {
+            base_color: Color::hex("#ffd891").unwrap(),
+            // vary key PBR parameters on a grid of spheres to show the effect
+            unlit: true,
+            ..default()
+        }),
+        transform: Transform::from_xyz(-5.0, -2.5, 0.0),
+        ..default()
+    });
 
-        Universe {
-            width,
-            height,
-            cells,
-        }
-    }
+    // light
+    commands.spawn(PointLightBundle {
+        transform: Transform::from_xyz(50.0, 50.0, 50.0),
+        point_light: PointLight {
+            intensity: 600000.,
+            range: 100.,
+            ..default()
+        },
+        ..default()
+    });
 
-    pub fn render(&self) -> String {
-        self.to_string()
-    }
+    // labels
+    commands.spawn(
+        TextBundle::from_section(
+            "Perceptual Roughness",
+            TextStyle {
+                font: asset_server.load("fonts/FiraMono-Medium.ttf"),
+                font_size: 36.0,
+                color: Color::WHITE,
+            },
+        )
+        .with_style(Style {
+            position_type: PositionType::Absolute,
+            position: UiRect {
+                top: Val::Px(20.0),
+                left: Val::Px(100.0),
+                ..default()
+            },
+            ..default()
+        }),
+    );
 
-    pub fn toggle_cell(&mut self, row: u32, column: u32) {
-        let idx = self.get_index(row, column);
-        self.cells[idx].toggle();
-    }
-}
+    commands.spawn(TextBundle {
+        text: Text::from_section(
+            "Metallic",
+            TextStyle {
+                font: asset_server.load("fonts/FiraMono-Medium.ttf"),
+                font_size: 36.0,
+                color: Color::WHITE,
+            },
+        ),
+        style: Style {
+            position_type: PositionType::Absolute,
+            position: UiRect {
+                top: Val::Px(130.0),
+                right: Val::Px(0.0),
+                ..default()
+            },
+            ..default()
+        },
+        transform: Transform {
+            rotation: Quat::from_rotation_z(std::f32::consts::PI / 2.0),
+            ..default()
+        },
+        ..default()
+    });
 
-use std::fmt;
+    commands.spawn((
+        TextBundle::from_section(
+            "Loading Environment Map...",
+            TextStyle {
+                font: asset_server.load("fonts/FiraMono-Medium.ttf"),
+                font_size: 36.0,
+                color: Color::RED,
+            },
+        )
+        .with_style(Style {
+            position_type: PositionType::Absolute,
+            position: UiRect {
+                bottom: Val::Px(20.0),
+                right: Val::Px(20.0),
+                ..default()
+            },
+            ..default()
+        }),
+        EnvironmentMapLabel,
+    ));
 
-impl fmt::Display for Universe {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        for line in self.cells.as_slice().chunks(self.width as usize) {
-            for &cell in line {
-                let symbol = if cell == Cell::Dead { '◻' } else { '◼' };
-                write!(f, "{}", symbol)?;
+    // camera
+    commands.spawn((
+        Camera3dBundle {
+            transform: Transform::from_xyz(0.0, 0.0, 8.0).looking_at(Vec3::default(), Vec3::Y),
+            projection: OrthographicProjection {
+                scale: 0.01,
+                ..default()
             }
-            writeln!(f)?;
+            .into(),
+            ..default()
+        },
+        EnvironmentMapLight {
+            diffuse_map: asset_server.load("environment_maps/pisa_diffuse_rgb9e5_zstd.ktx2"),
+            specular_map: asset_server.load("environment_maps/pisa_specular_rgb9e5_zstd.ktx2"),
+        },
+    ));
+}
+
+fn environment_map_load_finish(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    environment_maps: Query<&EnvironmentMapLight>,
+    label_query: Query<Entity, With<EnvironmentMapLabel>>,
+) {
+    if let Ok(environment_map) = environment_maps.get_single() {
+        if asset_server.get_load_state(&environment_map.diffuse_map) == LoadState::Loaded
+            && asset_server.get_load_state(&environment_map.specular_map) == LoadState::Loaded
+        {
+            if let Ok(label_entity) = label_query.get_single() {
+                commands.entity(label_entity).despawn();
+            }
         }
-
-        Ok(())
     }
 }
 
-impl Universe {
-    pub fn get_cells(&self) -> &[Cell] {
-        &self.cells
-    }
-
-    pub fn set_cells(&mut self, cells: &[(u32, u32)]) {
-        for (row, col) in cells.iter().cloned() {
-            let idx = self.get_index(row, col);
-            self.cells[idx] = Cell::Alive;
-        }
-    }
-}
-
-impl Cell {
-    fn toggle(&mut self) {
-        *self = match *self {
-            Cell::Dead => Cell::Alive,
-            Cell::Alive => Cell::Dead,
-        };
-    }
-}
+#[derive(Component)]
+struct EnvironmentMapLabel;
