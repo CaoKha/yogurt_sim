@@ -1,4 +1,6 @@
-use yogurt_sim::run_bevy_app; 
+mod bevy_example; 
+
+
 fn main() {
-    run_bevy_app();
+    bevy_example::run_bevy_example();
 }
