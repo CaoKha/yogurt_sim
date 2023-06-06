@@ -7,7 +7,7 @@ use std::f32::consts::PI;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
-pub fn run_bevy_example() {
+pub fn run_lighting_example() {
     App::new()
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
