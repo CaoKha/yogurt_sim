@@ -3,10 +3,20 @@ use bevy::window::PrimaryWindow;
 use rand::prelude::*;
 use wasm_bindgen::prelude::*;
 
+// pub const PLAYER_SEED: f32 = 500.0;
+pub const NUMBER_OF_ENEMIES: usize = 4;
+// pub const PLAYER_SIZE: f32 = 64.0;
+
 #[wasm_bindgen]
 pub fn run_ball_game() {
     App::new()
-        .add_plugins(DefaultPlugins)
+        .add_plugins(DefaultPlugins.set(WindowPlugin {
+            primary_window: Some(Window {
+                canvas: Some("#bevy_canvas".to_string()),
+                ..default()
+            }),
+            ..default()
+        }))
         .add_startup_system(spawn_camera)
         .add_startup_system(spawn_player)
         .add_startup_system(spawn_enemies)
@@ -15,6 +25,9 @@ pub fn run_ball_game() {
 
 #[derive(Component)]
 pub struct Player {}
+
+#[derive(Component)]
+pub struct Enemy {}
 
 pub fn spawn_player(
     mut commands: Commands,

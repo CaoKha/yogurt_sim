@@ -1,8 +1,8 @@
 "use client";
-import { init_bevy } from "@/utils/init_wasm";
+import { init_wasm } from "@/utils/init";
 
 export default function Home() {
-  init_bevy();
+  init_wasm();
   return (
     <div className="App">
       <canvas id="bevy_canvas"></canvas>
