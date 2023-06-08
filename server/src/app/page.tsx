@@ -1,5 +1,5 @@
 "use client";
-import { init_wasm } from "@/utils/init";
+import { init_wasm } from "./components/wasm/init";
 
 export default function Home() {
   init_wasm();
@@ -9,3 +9,4 @@ export default function Home() {
     </div>
   );
 }
+

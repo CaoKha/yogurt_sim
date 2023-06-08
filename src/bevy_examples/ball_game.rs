@@ -17,6 +17,7 @@ pub fn run_ball_game() {
             }),
             ..default()
         }))
+        // .add_plugins(DefaultPlugins)
         .add_startup_system(spawn_camera)
         .add_startup_system(spawn_player)
         .add_startup_system(spawn_enemies)
