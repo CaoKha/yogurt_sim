@@ -1,0 +1,17 @@
+{
+  "name": "yogurt_sim",
+  "collaborators": [
+    "nck13"
+  ],
+  "version": "0.1.0",
+  "files": [
+    "yogurt_sim_bg.wasm",
+    "yogurt_sim.js",
+    "yogurt_sim.d.ts"
+  ],
+  "module": "yogurt_sim.js",
+  "types": "yogurt_sim.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
