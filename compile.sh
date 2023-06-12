@@ -5,4 +5,4 @@
 # wasm-bindgen --out-dir ./server/public/wasm/ --target web ./target/wasm32-unknown-unknown/release/yogurt_sim.wasm
 BASEDIR=$(dirname "$0")
 echo "$BASEDIR"
-wasm-pack build $BASEDIR --release --target web
+wasm-pack build $BASEDIR --release --target web --out-dir server/pkg
