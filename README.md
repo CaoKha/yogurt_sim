@@ -54,23 +54,24 @@ or for simplicity, you can go to bevy_book and do all of their prerequisites
 ## Compilation
 Run these commands:
 ```bash
-chmod +x compile.sh
-./compile.sh
+chmod +x build.sh
+./build.sh
 ```
 These commands will generate a `pkg/` folder containing wasm and js files for the nextjs server.
 When a code is changed in lib.rs, remember to run 
 ```bash
-./compile.sh
+./build.sh
 
 ```
-again and remove the `.next/` and `node_modules/` folder in order to remove any existing caches:
+
+## Testing
+If you want to test on PC instead of wasm. Run:
 ```bash
-cd server/
-rm -r .next node_modules 
+cargo run
 ```
-Then, install all the packages and run the server again:
-```bash
-yarn install
-yarn run dev
+
+If you want to run on a website (Nextjs), make sure you have Nodejs and Yarn installed, then run:  
+```
+cd server && yarn start
 ```
 
