@@ -15,5 +15,5 @@ echo "Installing packages..."
 yarn install
 echo "Building nextjs server..."
 yarn run build
-# echo "Starting server..."
-# yarn run start
+echo "Starting server..."
+yarn run start
