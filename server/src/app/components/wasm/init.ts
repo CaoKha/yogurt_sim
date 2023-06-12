@@ -1,10 +1,10 @@
-import init, { InitOutput, run_ball_game } from "yogurt-sim";
+import init, { InitOutput, run_lighting_example } from "yogurt-sim";
 
 export async function init_wasm() {
   await init()
     .then((wasm_js: InitOutput) => {
       console.log(wasm_js);
-      run_ball_game();
+      run_lighting_example();
     })
     .catch((e: unknown) => {
       // intentional error from wasm, we can ignore this error message:
