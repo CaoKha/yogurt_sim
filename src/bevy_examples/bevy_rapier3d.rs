@@ -1,4 +1,4 @@
-use bevy::{pbr::{CascadeShadowConfigBuilder, DirectionalLightShadowMap}, prelude::*};
+use bevy::{pbr::CascadeShadowConfigBuilder, prelude::*};
 use bevy_rapier3d::prelude::*;
 use std::f32::consts::PI;
 use wasm_bindgen::prelude::wasm_bindgen;
@@ -18,7 +18,6 @@ pub fn run_rapier3d_example() {
         .add_plugin(RapierDebugRenderPlugin::default())
         .add_startup_system(setup_graphics)
         .add_startup_system(setup_physics)
-        .insert_resource(DirectionalLightShadowMap { size: 2048 })
         // .add_system(print_ball_altitude)
         .run();
 }
