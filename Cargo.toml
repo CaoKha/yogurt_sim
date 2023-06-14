@@ -11,22 +11,13 @@ crate-type = ["cdylib", "rlib"]
 default = ["console_error_panic_hook"]
 
 [dependencies]
+rand = "0.8.5"
 wasm-bindgen = "0.2.86"
-# js-sys = "0.3.63"
-fixedbitset = "0.4.2"
-# The `console_error_panic_hook` crate provides better debugging of panics by
-# logging them with `console.error`. This is great for development, but requires
-# all the `std::fmt` and `std::panicking` infrastructure, so isn't great for
-# code size when deploying.
 console_error_panic_hook = { version = "0.1.7", optional = true }
-
-# `wee_alloc` is a tiny allocator for wasm that is only ~1K in code size
-# compared to the default allocator's ~10K. It is slower than the default
-# allocator, however.
-wee_alloc = { version = "0.4.5", optional = true }
 bevy = {version = "0.10.1" }
 bevy_ecs = "0.10.1"
-rand = "0.8.5"
+bevy_rapier2d = { version = "*", features = [ "simd-stable", "debug-render-2d" ] }
+bevy_rapier3d = { version = "*", features = [ "simd-stable", "debug-render-3d" ] }
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.36"
@@ -35,7 +26,12 @@ wasm-bindgen-test = "0.3.36"
 # disabled by setting it to `false`
 [package.metadata.wasm-pack.profile.release]
 wasm-opt = false
+lto = "thin"
 
 [dependencies.web-sys]
 version = "0.3.63"
 features = ["console"]
+
+# Enable max optimizations for dependencies, but not for our code:
+[profile.dev.package."*"]
+opt-level = 3

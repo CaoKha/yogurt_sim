@@ -4,7 +4,7 @@
 
 use bevy::{pbr::CascadeShadowConfigBuilder, prelude::*};
 use std::f32::consts::PI;
-use wasm_bindgen::prelude::*;
+use wasm_bindgen::prelude::wasm_bindgen;
 
 #[wasm_bindgen]
 pub fn run_lighting_example() {
@@ -12,6 +12,7 @@ pub fn run_lighting_example() {
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
                 canvas: Some("#bevy_canvas".to_string()),
+                fit_canvas_to_parent: true,
                 ..default()
             }),
             ..default()

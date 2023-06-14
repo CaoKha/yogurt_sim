@@ -12,10 +12,10 @@ wasm-pack build $BASEDIR --release --target web --out-dir server/pkg
 echo "Change directory to server/"
 cd $BASEDIR/server
 echo "Remove old cache"
-rm -r .next
+rm -r .next node_modules
 echo "Installing packages..."
 yarn install
 echo "Building nextjs server..."
-yarn run build
+yarn build
 # echo "Starting server..."
 # yarn run start

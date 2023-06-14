@@ -1,0 +1,47 @@
+use bevy::prelude::*;
+use bevy_rapier2d::prelude::*;
+use wasm_bindgen::prelude::wasm_bindgen;
+
+#[wasm_bindgen]
+pub fn run_rapier2d_example() {
+    App::new()
+        .add_plugins(DefaultPlugins.set(WindowPlugin {
+            primary_window: Some(Window {
+                canvas: Some("#bevy_canvas".to_string()),
+                fit_canvas_to_parent: true,
+                ..default()
+            }),
+            ..default()
+        }))
+        .add_plugin(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
+        .add_plugin(RapierDebugRenderPlugin::default())
+        .add_startup_system(setup_graphics)
+        .add_startup_system(setup_physics)
+        .add_system(print_ball_altitude)
+        .run();
+}
+
+fn setup_graphics(mut commands: Commands) {
+    // Add a camera so we can see the debug-render.
+    commands.spawn(Camera2dBundle::default());
+}
+
+fn setup_physics(mut commands: Commands) {
+    /* Create the ground. */
+    commands
+        .spawn(Collider::cuboid(500.0, 50.0))
+        .insert(TransformBundle::from(Transform::from_xyz(0.0, -100.0, 0.0)));
+
+    /* Create the bouncing ball. */
+    commands
+        .spawn(RigidBody::Dynamic)
+        .insert(Collider::ball(50.0))
+        .insert(Restitution::coefficient(0.7))
+        .insert(TransformBundle::from(Transform::from_xyz(0.0, 400.0, 0.0)));
+}
+
+fn print_ball_altitude(positions: Query<&Transform, With<RigidBody>>) {
+    for transform in positions.iter() {
+        println!("Ball altitude: {}", transform.translation.y);
+    }
+}
