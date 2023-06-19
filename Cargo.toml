@@ -9,15 +9,19 @@ crate-type = ["cdylib", "rlib"]
 
 [features]
 default = ["console_error_panic_hook"]
+ball_game = []
+lighting =[]
+rapier2d = []
+rapier3d = []
 
 [dependencies]
 rand = "0.8.5"
 wasm-bindgen = "0.2.86"
 console_error_panic_hook = { version = "0.1.7", optional = true }
-bevy = {version = "0.10.1" }
-bevy_ecs = "0.10.1"
-bevy_rapier2d = { version = "*", features = [ "simd-stable", "debug-render-2d" ] }
-bevy_rapier3d = { version = "*", features = [ "simd-stable", "debug-render-3d" ] }
+bevy = { version = "0.10.1" }
+bevy_ecs = { version = "0.10.1" }
+bevy_rapier2d = { version = "0.21.0", features = [ "simd-stable", "debug-render-2d" ] }
+bevy_rapier3d = { version = "0.21.0", features = [ "simd-stable", "debug-render-3d" ] }
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.36"
@@ -28,9 +32,8 @@ wasm-bindgen-test = "0.3.36"
 wasm-opt = false
 lto = "thin"
 
-[dependencies.web-sys]
-version = "0.3.63"
-features = ["console"]
+[profile.dev]
+opt-level = 1
 
 # Enable max optimizations for dependencies, but not for our code:
 [profile.dev.package."*"]
