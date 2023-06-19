@@ -8,7 +8,7 @@ BASEDIR=$(dirname "$0")
 # echo "Remove Rust target folder"
 # rm -r $BASEDIR/target/
 echo "Compiling wasm to js..."
-wasm-pack build $BASEDIR --release --target web --out-dir server/pkg
+wasm-pack build "$BASEDIR" --release --target web --out-dir server/pkg
 echo "Change directory to server/"
 cd $BASEDIR/server
 echo "Remove old cache"
@@ -17,5 +17,8 @@ echo "Installing packages..."
 yarn install
 echo "Building nextjs server..."
 yarn build
+echo "Copying assets to public/ folder"
+cd ..
+cp -a ./assets ./server/public/
 # echo "Starting server..."
 # yarn run start
