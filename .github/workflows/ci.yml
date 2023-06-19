@@ -1,4 +1,4 @@
-name: Test chronic CI
+name: CI
 
 on:
   schedule:

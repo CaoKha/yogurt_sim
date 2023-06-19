@@ -1,6 +1,7 @@
 # yogurt_sim
-A yogurt simulation (currently in development phase)
 [![Build Status](https://github.com/CaoKha/yogurt_sim/actions/workflows/ci.yaml/badge.svg)](https://github.com/CaoKha/yogurt_sim/actions/workflows/ci.yaml)
+
+A yogurt simulation (currently in development phase)
 ![ohaio](https://media.tenor.com/G78em4XTdjwAAAAd/yogurt.gif)
 
 ## Prerequisites
