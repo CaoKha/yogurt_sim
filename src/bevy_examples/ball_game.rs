@@ -16,6 +16,7 @@ pub fn run_ball_game() {
             primary_window: Some(Window {
                 canvas: Some("#bevy_canvas".to_string()),
                 fit_canvas_to_parent: true,
+                resizable: true,
                 ..default()
             }),
             ..default()
@@ -30,13 +31,14 @@ pub fn run_ball_game() {
         .add_system(update_enemy_direction)
         .add_system(confine_enemy_movement)
         .add_system(enemy_hit_player)
+        .add_system(enemy_hit_enemy)
         .run();
 }
 
 #[derive(Component)]
 pub struct Player {}
 
-#[derive(Component)]
+#[derive(Component, Debug)]
 pub struct Enemy {
     pub direction: Vec2,
 }
@@ -249,6 +251,51 @@ pub fn enemy_hit_player(
                 audio.play(sound_effect);
                 commands.entity(player_entity).despawn();
             }
+        }
+    }
+}
+
+pub fn enemy_hit_enemy(
+    mut enemy_query: Query<(&Transform, &mut Enemy)>,
+    audio: Res<Audio>,
+    asset_server: Res<AssetServer>,
+) {
+    let mut iter = enemy_query.iter_combinations_mut();
+    while let Some([(transform1, mut enemy1), (transform2, mut enemy2)]) = iter.fetch_next() {
+        let distance = transform1.translation.distance(transform2.translation);
+        let enemy_radius = ENEMY_SIZE / 2.0;
+        let mut direction_changed = false;
+        if distance < 2.0 * enemy_radius {
+            if transform1.translation.y > transform1.translation.x {
+                enemy1.direction.y *= -1.0;
+
+            }
+            if transform1.translation.x > transform1.translation.y {
+                enemy1.direction.x *= -1.0;
+
+            }
+            if transform2.translation.y > transform2.translation.x {
+                enemy2.direction.y *= -1.0;
+
+            }
+            if transform2.translation.x > transform2.translation.y {
+                enemy2.direction.x *= -1.0;
+
+            }
+            direction_changed = true;
+        }
+        // Play SFX
+        if direction_changed {
+            // Play Sound Effect
+            let sound_effect_1 = asset_server.load("audio/pluck_001.ogg");
+            let sound_effect_2 = asset_server.load("audio/pluck_002.ogg");
+            // Randomly play one of the two sound effects.
+            let sound_effect = if random::<f32>() > 0.5 {
+                sound_effect_1
+            } else {
+                sound_effect_2
+            };
+            audio.play(sound_effect);
         }
     }
 }
