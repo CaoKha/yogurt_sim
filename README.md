@@ -1,5 +1,5 @@
 # yogurt_sim
-[![CI](https://github.com/CaoKha/yogurt_sim/workflows/Rust/badge.svg)](https://github.com/CaoKha/yogurt_sim/actions/workflows/rust.yaml)
+[![CI](https://github.com/CaoKha/yogurt_sim/workflows/CI/badge.svg)](https://github.com/CaoKha/yogurt_sim/actions/workflows/ci.yaml)
 
 A yogurt simulation (currently in development phase)
 ![ohaio](https://media.tenor.com/G78em4XTdjwAAAAd/yogurt.gif)
@@ -68,7 +68,7 @@ When a code is changed in lib.rs, remember to run
 ## Testing
 If you want to test on PC instead of wasm. Run:
 ```bash
-cargo run
+cargo run --features="ball_game"
 ```
 
 If you want to run on a website (Nextjs), make sure you have Nodejs and Yarn installed, then run:  

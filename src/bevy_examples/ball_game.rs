@@ -41,6 +41,7 @@ pub struct Player {}
 #[derive(Component, Debug)]
 pub struct Enemy {
     pub direction: Vec2,
+    pub last_position: Vec3,
 }
 
 pub fn spawn_player(
@@ -88,6 +89,7 @@ pub fn spawn_enemies(
             },
             Enemy {
                 direction: Vec2::new(random::<f32>(), random::<f32>()).normalize(),
+                last_position: Vec3::new(random_x, random_y, 0.0),
             },
         ));
     }
@@ -266,24 +268,23 @@ pub fn enemy_hit_enemy(
         let enemy_radius = ENEMY_SIZE / 2.0;
         let mut direction_changed = false;
         if distance < 2.0 * enemy_radius {
-            if transform1.translation.y > transform1.translation.x {
-                enemy1.direction.y *= -1.0;
+            // TODO: physics 2 balls collision:
+            println!(
+                "enemy1 {:?} enemy2 {:?}",
+                (transform1.translation.y - enemy1.last_position.y)
+                    .atan2(transform1.translation.x - enemy1.last_position.x),
+                (transform2.translation.y - enemy2.last_position.y)
+                    .atan2(transform2.translation.x - enemy2.last_position.x)
+            );
+            enemy1.direction.y *= -1.0;
+            enemy1.direction.x *= -1.0;
+            enemy2.direction.y *= -1.0;
+            enemy2.direction.x *= -1.0;
 
-            }
-            if transform1.translation.x > transform1.translation.y {
-                enemy1.direction.x *= -1.0;
-
-            }
-            if transform2.translation.y > transform2.translation.x {
-                enemy2.direction.y *= -1.0;
-
-            }
-            if transform2.translation.x > transform2.translation.y {
-                enemy2.direction.x *= -1.0;
-
-            }
             direction_changed = true;
         }
+        enemy1.last_position = transform1.translation;
+        enemy2.last_position = transform2.translation;
         // Play SFX
         if direction_changed {
             // Play Sound Effect
