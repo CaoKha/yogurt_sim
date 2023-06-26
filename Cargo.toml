@@ -9,10 +9,6 @@ crate-type = ["cdylib", "rlib"]
 
 [features]
 default = ["console_error_panic_hook"]
-ball_game = []
-lighting =[]
-rapier2d = []
-rapier3d = []
 
 [dependencies]
 rand = "0.8.5"
@@ -30,7 +26,6 @@ wasm-bindgen-test = "0.3.36"
 # disabled by setting it to `false`
 [package.metadata.wasm-pack.profile.release]
 wasm-opt = false
-lto = "thin"
 
 [profile.dev]
 opt-level = 1
