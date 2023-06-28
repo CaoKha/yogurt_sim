@@ -2,25 +2,37 @@
 /* eslint-disable */
 /**
 */
+export function run_ocean(): void;
+/**
+*/
+export function run_lighting_example(): void;
+/**
+*/
 export function run_ball_game(): void;
 /**
 */
 export function run_rapier2d_example(): void;
 /**
 */
-export function run_rapier3d_example(): void;
+export function run_ocean_simple(): void;
 /**
 */
-export function run_lighting_example(): void;
+export function run_uv_sphere(): void;
+/**
+*/
+export function run_rapier3d_example(): void;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
+  readonly run_ocean: () => void;
+  readonly run_lighting_example: () => void;
   readonly run_ball_game: () => void;
   readonly run_rapier2d_example: () => void;
+  readonly run_ocean_simple: () => void;
+  readonly run_uv_sphere: () => void;
   readonly run_rapier3d_example: () => void;
-  readonly run_lighting_example: () => void;
   readonly wgpu_compute_pass_set_pipeline: (a: number, b: number) => void;
   readonly wgpu_compute_pass_set_bind_group: (a: number, b: number, c: number, d: number, e: number) => void;
   readonly wgpu_compute_pass_set_push_constant: (a: number, b: number, c: number, d: number) => void;

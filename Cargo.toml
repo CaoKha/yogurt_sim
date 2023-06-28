@@ -8,18 +8,30 @@ edition = "2021"
 crate-type = ["cdylib", "rlib"]
 
 [features]
-default = ["console_error_panic_hook"]
+default = ["console_error_panic_hook", "embed_shaders", "depth_prepass"]
 
+# Embed the shaders at compile-time.
+embed_shaders = []
+
+# Enable debug lines in examples.
+debug = []
+
+# Enable DepthPrepass in examples.
+depth_prepass = []
 [dependencies]
 rand = "0.8.5"
 wasm-bindgen = "0.2.86"
 console_error_panic_hook = { version = "0.1.7", optional = true }
-bevy = { version = "0.10.1" }
+bevy = { version = "0.10.1", features = ["bevy_asset", "bevy_render", "bevy_pbr"] }
 bevy_ecs = { version = "0.10.1" }
 bevy_rapier2d = { version = "0.21.0", features = [ "simd-stable", "debug-render-2d" ] }
 bevy_rapier3d = { version = "0.21.0", features = [ "simd-stable", "debug-render-3d" ] }
+bevy_atmosphere = "0.6.0"
+bevy_panorbit_camera = "0.5.2"
+bevy_spectator = "0.2.0"
 
 [dev-dependencies]
+bevy_prototype_debug_lines = { version = "0.10.1", features = ["3d"] }
 wasm-bindgen-test = "0.3.36"
 
 # `wasm-opt` is on by default in for the release profile, but it can be

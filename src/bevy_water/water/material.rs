@@ -284,6 +284,7 @@ impl Plugin for WaterMaterialPlugin {
     load_internal_asset!(
       app,
       NOISE_FBM_SHADER_HANDLE,
+      // concat!(env!("CARGO_MANIFEST_DIR"), "/assets/shaders/noise/fbm.wgsl"),
       concat!(env!("CARGO_MANIFEST_DIR"), "/assets/shaders/noise/fbm.wgsl"),
       Shader::from_wgsl
     );

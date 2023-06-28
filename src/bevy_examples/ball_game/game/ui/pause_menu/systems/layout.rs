@@ -1,7 +1,9 @@
 use bevy::prelude::*;
 
 use crate::bevy_examples::ball_game::game::ui::pause_menu::components::{
-    MainMenuButton, PauseMenu, QuitButton, ResumeButton,
+    MainMenuButton, PauseMenu, 
+    // QuitButton, 
+    ResumeButton,
 };
 use crate::bevy_examples::ball_game::game::ui::pause_menu::styles::*;
 

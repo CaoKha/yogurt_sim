@@ -17,8 +17,9 @@ echo "Installing packages..."
 yarn install
 echo "Building nextjs server..."
 yarn build
-echo "Copying assets to public/ folder"
+echo "Copying assets to public/ folder..."
 cd ..
 cp -a ./assets ./server/public/
+echo "Done."
 # echo "Starting server..."
 # yarn run start

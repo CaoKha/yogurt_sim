@@ -1,10 +1,13 @@
 /* tslint:disable */
 /* eslint-disable */
 export const memory: WebAssembly.Memory;
+export function run_ocean(): void;
+export function run_lighting_example(): void;
 export function run_ball_game(): void;
 export function run_rapier2d_example(): void;
+export function run_ocean_simple(): void;
+export function run_uv_sphere(): void;
 export function run_rapier3d_example(): void;
-export function run_lighting_example(): void;
 export function wgpu_compute_pass_set_pipeline(a: number, b: number): void;
 export function wgpu_compute_pass_set_bind_group(a: number, b: number, c: number, d: number, e: number): void;
 export function wgpu_compute_pass_set_push_constant(a: number, b: number, c: number, d: number): void;
