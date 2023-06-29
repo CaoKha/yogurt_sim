@@ -1,8 +1,11 @@
-pub async fn init_surface(window: &winit::window::Window) -> (wgpu::Surface, wgpu::Adapter) {
+pub async fn init_surface(window: winit::window::Window) -> (wgpu::Surface, wgpu::Adapter, winit::window::Window) {
     // the instance is a handle to our GPU
     // Backends::all => Vulkan + Metal + DX12 + Browser WebGPUÒ
-    let instance = wgpu::Instance::new(wgpu::Backends::all());
-    let surface = unsafe { instance.create_surface(window) };
+    let instance = wgpu::Instance::new(wgpu::InstanceDescriptor {
+        backends: wgpu::Backends::all(),
+        dx12_shader_compiler: Default::default(),
+    });
+    let surface = unsafe { instance.create_surface(&window) }.unwrap();
     let adapter = instance
         .request_adapter(&wgpu::RequestAdapterOptions {
             power_preference: wgpu::PowerPreference::default(),
@@ -11,7 +14,7 @@ pub async fn init_surface(window: &winit::window::Window) -> (wgpu::Surface, wgp
         })
         .await
         .unwrap();
-    (surface, adapter)
+    (surface, adapter, window)
 }
 
 pub async fn init_device(adapter: &wgpu::Adapter) -> (wgpu::Device, wgpu::Queue) {
@@ -39,12 +42,15 @@ pub fn init_config(
     surface: &wgpu::Surface,
     adapter: &wgpu::Adapter,
 ) -> wgpu::SurfaceConfiguration {
+    let surface_caps = surface.get_capabilities(adapter);
+    let surface_format = surface_caps.formats.iter().copied().find(|f| f.is_srgb()).unwrap_or(surface_caps.formats[0]);
     wgpu::SurfaceConfiguration {
         usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
-        format: surface.get_supported_formats(&adapter)[0],
+        format: surface_format,
         width: size.width,
         height: size.height,
-        present_mode: wgpu::PresentMode::Fifo,
-        alpha_mode: wgpu::CompositeAlphaMode::Auto,
+        present_mode: surface_caps.present_modes[0],
+        alpha_mode: surface_caps.alpha_modes[0],
+        view_formats: vec![]
     }
 }

@@ -3,7 +3,7 @@
 use wasm_bindgen::prelude::*;
 
 use winit::{
-    event::*,
+    event::{ElementState, Event, KeyboardInput, VirtualKeyCode, WindowEvent},
     event_loop::{ControlFlow, EventLoop},
 };
 
@@ -19,7 +19,7 @@ pub async fn run() {
 
     let window = setup_window(&event_loop);
 
-    let mut state = State::new(&window).await;
+    let mut state = State::new(window).await;
 
     // Event loop...
     event_loop.run(move |event, _, control_flow| {
@@ -27,7 +27,7 @@ pub async fn run() {
             Event::WindowEvent {
                 ref event,
                 window_id,
-            } if window_id == window.id() => {
+            } if window_id == state.window().id() => {
                 if !state.input(event) {
                     match event {
                         WindowEvent::CloseRequested
@@ -51,7 +51,7 @@ pub async fn run() {
                     }
                 }
             }
-            Event::RedrawRequested(window_id) if window_id == window.id() => {
+            Event::RedrawRequested(window_id) if window_id == state.window().id() => {
                 state.update();
                 match state.render() {
                     Ok(_) => {}
@@ -66,7 +66,7 @@ pub async fn run() {
             Event::MainEventsCleared => {
                 // RedrawRequested will only trigger once, unless we manually
                 // request it.
-                window.request_redraw();
+                state.window().request_redraw();
             }
             _ => {}
         }
