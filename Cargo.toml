@@ -20,7 +20,7 @@ debug = []
 depth_prepass = []
 [dependencies]
 rand = "0.8.5"
-wasm-bindgen = "0.2.86"
+wasm-bindgen = "0.2.87"
 console_error_panic_hook = { version = "0.1.7", optional = true }
 bevy = { version = "0.10.1", features = ["bevy_asset", "bevy_render", "bevy_pbr"] }
 bevy_ecs = { version = "0.10.1" }
