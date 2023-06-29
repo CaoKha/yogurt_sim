@@ -31,6 +31,7 @@ const INDICES: &[u16] = &[
 ];
 
 pub struct State {
+    window: Window,
     surface: wgpu::Surface,
     device: wgpu::Device,
     queue: wgpu::Queue,
@@ -50,13 +51,11 @@ pub struct State {
 
 impl State {
     // Creating some of the wgpu types requires async code
-    pub async fn new(window: &Window) -> Self {
-        let (surface, adapter) = init_surface(window).await;
-
+    pub async fn new(window: Window) -> Self {
         let size = window.inner_size();
-        let config = init_config(size, &surface, &adapter);
-
+        let (surface, adapter, window) = init_surface(window).await;
         let (device, queue) = init_device(&adapter).await;
+        let config = init_config(size, &surface, &adapter);
         surface.configure(&device, &config);
 
         // NEW
@@ -95,6 +94,7 @@ impl State {
         let index_buffer = Some(Buffer::new(&device, INDICES, wgpu::BufferUsages::INDEX, "Index Buffer"));
 
         Self {
+            window,
             surface,
             device,
             queue,
@@ -107,6 +107,10 @@ impl State {
             diffuse_bind_group,
             diffuse_texture,
         }
+    }
+
+    pub fn window(&self) -> &Window {
+        &self.window
     }
 
     pub fn resize(&mut self, new_size: winit::dpi::PhysicalSize<u32>) {
