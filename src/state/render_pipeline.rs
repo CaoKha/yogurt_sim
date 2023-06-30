@@ -11,7 +11,7 @@ impl RenderPipeline {
         config: &wgpu::SurfaceConfiguration,
         bind_group_layouts: &[&wgpu::BindGroupLayout],
     ) -> Self {
-        let shader = device.create_shader_module(wgpu::include_wgsl!("shader.wgsl"));
+        let shader = device.create_shader_module(wgpu::include_wgsl!("triangle.wgsl"));
 
         let render_pipeline = init_render_pipeline(
             &device,
