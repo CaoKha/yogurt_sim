@@ -9,7 +9,6 @@ use winit::{
 
 mod window;
 use crate::window::setup_window;
-
 mod state;
 use crate::state::State;
 
