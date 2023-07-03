@@ -1,11 +1,11 @@
-pub async fn init_surface(window: winit::window::Window) -> (wgpu::Surface, wgpu::Adapter, winit::window::Window) {
+pub async fn init_surface(window: &winit::window::Window) -> (wgpu::Surface, wgpu::Adapter) {
     // the instance is a handle to our GPU
     // Backends::all => Vulkan + Metal + DX12 + Browser WebGPUÒ
     let instance = wgpu::Instance::new(wgpu::InstanceDescriptor {
         backends: wgpu::Backends::all(),
         dx12_shader_compiler: Default::default(),
     });
-    let surface = unsafe { instance.create_surface(&window) }.unwrap();
+    let surface = unsafe { instance.create_surface(window) }.unwrap();
     let adapter = instance
         .request_adapter(&wgpu::RequestAdapterOptions {
             power_preference: wgpu::PowerPreference::default(),
@@ -14,7 +14,7 @@ pub async fn init_surface(window: winit::window::Window) -> (wgpu::Surface, wgpu
         })
         .await
         .unwrap();
-    (surface, adapter, window)
+    (surface, adapter)
 }
 
 pub async fn init_device(adapter: &wgpu::Adapter) -> (wgpu::Device, wgpu::Queue) {
