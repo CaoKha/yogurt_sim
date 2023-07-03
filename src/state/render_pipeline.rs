@@ -70,11 +70,11 @@ fn init_render_pipeline(
     shader: &wgpu::ShaderModule,
     vertex_entry_point: &str,
     fragment_entry_point: &str,
-    bind_group_layouts: &[&wgpu::BindGroupLayout],
+    bg_layouts: &[&wgpu::BindGroupLayout],
 ) -> wgpu::RenderPipeline {
     let render_pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
         label: Some("Render Pipeline layout"),
-        bind_group_layouts: bind_group_layouts,
+        bind_group_layouts: bg_layouts,
         push_constant_ranges: &[],
     });
 
