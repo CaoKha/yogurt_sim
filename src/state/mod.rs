@@ -53,7 +53,7 @@ impl State {
     // Creating some of the wgpu types requires async code
     pub async fn new(window: Window) -> Self {
         let size = window.inner_size();
-        let (surface, adapter, window) = init_surface(window).await;
+        let (surface, adapter) = init_surface(&window).await;
         let (device, queue) = init_device(&adapter).await;
         let config = init_config(size, &surface, &adapter);
         surface.configure(&device, &config);
