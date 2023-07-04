@@ -46,7 +46,7 @@ pub struct State {
     index_buffer: Option<Buffer>,
 
     diffuse_bind_group: wgpu::BindGroup, // NEW
-    diffuse_texture: texture::Texture,
+    // diffuse_texture: texture::Texture,
 }
 
 impl State {
@@ -105,7 +105,7 @@ impl State {
             vertex_buffer,
             index_buffer,
             diffuse_bind_group,
-            diffuse_texture,
+            // diffuse_texture,
         }
     }
 
