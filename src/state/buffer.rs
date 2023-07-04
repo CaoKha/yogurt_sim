@@ -9,13 +9,13 @@ impl Buffer {
     pub fn new<T: bytemuck::NoUninit>(
         device: &wgpu::Device,
         data: &[T],
-        usage: wgpu::BufferUsages,
+        b_usage: wgpu::BufferUsages,
         name: &str,
     ) -> Self {
         let buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some(name),
             contents: bytemuck::cast_slice(data),
-            usage: usage,
+            usage: b_usage,
         });
 
         let size = data.len() as u32;

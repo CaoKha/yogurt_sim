@@ -15,9 +15,7 @@ use crate::state::State;
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen(start))]
 pub async fn run() {
     let event_loop = EventLoop::new();
-
     let window = setup_window(&event_loop);
-
     let mut state = State::new(window).await;
 
     // Event loop...

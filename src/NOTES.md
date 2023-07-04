@@ -84,4 +84,42 @@ fn init_render_pipeline(
 - 1u = 1 unsigned = 0b0001
 ## What is a buffer?
 - data stored <ins>sequentially</ins> in memory.
-
+### Vertex buffer
+- storage for vertex data
+```rust
+// lib.rs
+#[repr(C)]
+#[derive(Copy, Clone, Debug)]
+struct Vertex {
+    position: [f32; 3],
+    color: [f32; 3],
+}
+```
+- implement `Copy`
+### What to do with it?
+- `VertexBufferLayou` defines how a buffer is represented in memory.
+```rust
+wgpu::VertexBufferLayout {
+    array_stride: std::mem::size_of::<Vertex>() as wgpu::BufferAddress, // 1.
+    step_mode: wgpu::VertexStepMode::Vertex, // 2.
+    attributes: &[ // 3.
+        wgpu::VertexAttribute {
+            offset: 0, // 4.
+            shader_location: 0, // 5.
+            format: wgpu::VertexFormat::Float32x3, // 6.
+        },
+        wgpu::VertexAttribute {
+            offset: std::mem::size_of::<[f32; 3]>() as wgpu::BufferAddress,
+            shader_location: 1,
+            format: wgpu::VertexFormat::Float32x3,
+        }
+    ]
+}
+```
+- `array_stride`: how wide vertex is
+- `step_mode`: tells pipeline whether each element of array in this buffer represents per vertex data or per-instance data
+- `attributes`: 
+    - `offset`: offset in bytes until the attribute starts. First attribute usually at 0. For any later attributes, te offset is the sum over `size_of` the previous attributes' data.
+    - `shader_location`: for example, `@location(0) x: vec3<f32>` -> `position` field of Vertex struct
+                                        `@location(1) x: vec3<f32>` -> `color` field
+- `format` shape of the attribute. `Float32x4` -> correspond to `vec3<f32>` in shader code. 

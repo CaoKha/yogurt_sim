@@ -1,3 +1,4 @@
+
 use super::buffer;
 use super::vertex::Vertex;
 
@@ -9,9 +10,9 @@ impl RenderPipeline {
     pub fn new(
         device: &wgpu::Device,
         config: &wgpu::SurfaceConfiguration,
+        shader: wgpu::ShaderModule
         // bind_group_layouts: &[&wgpu::BindGroupLayout],
     ) -> Self {
-        let shader = device.create_shader_module(wgpu::include_wgsl!("triangle.wgsl"));
 
         let render_pipeline = init_render_pipeline(
             &device,
@@ -21,6 +22,8 @@ impl RenderPipeline {
             "fs_main",
             // bind_group_layouts,
         );
+
+
 
         RenderPipeline { render_pipeline }
     }
@@ -32,6 +35,7 @@ impl RenderPipeline {
         color: wgpu::Color,
         vertex_buffer: &buffer::Buffer,
         index_buffer: &Option<buffer::Buffer>,
+        num_vertices: u32
         // diffuse_bind_group: &wgpu::BindGroup,
     ) {
         let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
@@ -61,7 +65,8 @@ impl RenderPipeline {
         // } else {
         //     vertex_buffer.drawn_on(&mut render_pass);
         // }
-        render_pass.draw(0..3, 0..1);
+        render_pass.set_vertex_buffer(0, (vertex_buffer.buffer).slice(..));
+        render_pass.draw(0..num_vertices, 0..1);
     }
 }
 
@@ -87,7 +92,7 @@ fn init_render_pipeline(
             module: &shader,
             entry_point: vertex_entry_point,
             // buffers: &[Vertex::desc()],
-            buffers: &[],
+            buffers: &[Vertex::desc()],
         },
         fragment: Some(wgpu::FragmentState {
             module: &shader,

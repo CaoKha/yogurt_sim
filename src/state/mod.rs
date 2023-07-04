@@ -14,13 +14,18 @@ use vertex::Vertex;
 
 mod texture;
 
+// const VERTICES: &[Vertex] = &[
+//     Vertex { position: [-0.0868241, 0.49240386, 0.0], tex_coords: [0.4131759, 0.00759614], }, // A
+//     Vertex { position: [-0.49513406, 0.06958647, 0.0], tex_coords: [0.0048659444, 0.43041354], }, // B
+//     Vertex { position: [-0.21918549, -0.44939706, 0.0], tex_coords: [0.28081453, 0.949397], }, // C
+//     Vertex { position: [0.35966998, -0.3473291, 0.0], tex_coords: [0.85967, 0.84732914], }, // D
+//     Vertex { position: [0.44147372, 0.2347359, 0.0], tex_coords: [0.9414737, 0.2652641], }, // E
+// ];
 #[rustfmt::skip]
 const VERTICES: &[Vertex] = &[
-    Vertex { position: [-0.0868241, 0.49240386, 0.0], tex_coords: [0.4131759, 0.00759614], }, // A
-    Vertex { position: [-0.49513406, 0.06958647, 0.0], tex_coords: [0.0048659444, 0.43041354], }, // B
-    Vertex { position: [-0.21918549, -0.44939706, 0.0], tex_coords: [0.28081453, 0.949397], }, // C
-    Vertex { position: [0.35966998, -0.3473291, 0.0], tex_coords: [0.85967, 0.84732914], }, // D
-    Vertex { position: [0.44147372, 0.2347359, 0.0], tex_coords: [0.9414737, 0.2652641], }, // E
+    Vertex { position: [0.0, 0.5, 0.0], color: [1.0, 0.0, 0.0] },
+    Vertex { position: [-0.5, -0.5, 0.0], color: [0.0, 1.0, 0.0] },
+    Vertex { position: [0.5, -0.5, 0.0], color: [0.0, 0.0, 1.0] },
 ];
 
 #[rustfmt::skip]
@@ -37,16 +42,13 @@ pub struct State {
     queue: wgpu::Queue,
     config: wgpu::SurfaceConfiguration,
     size: winit::dpi::PhysicalSize<u32>,
-
     clear_color: wgpu::Color, // Challenge tutorial Surface
-
     render_pipeline: RenderPipeline,
-
     vertex_buffer: Buffer,
     index_buffer: Option<Buffer>,
-
-    // diffuse_bind_group: wgpu::BindGroup, // NEW
-    // diffuse_texture: texture::Texture,
+    num_vertices: u32,
+    use_color: bool, // diffuse_bind_group: wgpu::BindGroup, // NEW
+                     // diffuse_texture: texture::Texture,
 }
 
 impl State {
@@ -57,6 +59,9 @@ impl State {
         let (device, queue) = init_device(&adapter).await;
         let config = init_config(size, &surface, &adapter);
         surface.configure(&device, &config);
+
+        let num_vertices = VERTICES.len() as u32;
+        let use_color = true;
 
         // NEW
         // let texture_bind_group_layout = device.create_bind_group_layout(
@@ -84,16 +89,26 @@ impl State {
 
         // END NEW
 
-        let render_pipeline = RenderPipeline::new(&device, &config, 
-             // &[&texture_bind_group_layout]
+        let shader = device.create_shader_module(wgpu::include_wgsl!("triangle.wgsl"));
+        let render_pipeline = RenderPipeline::new(
+            &device, &config, shader,
+            // &[&texture_bind_group_layout]
         );
 
         let clear_color = wgpu::Color::BLACK;
 
-        #[rustfmt::skip]
-        let vertex_buffer = Buffer::new(&device, VERTICES, wgpu::BufferUsages::VERTEX, "Vertex buffer");
-        #[rustfmt::skip]
-        let index_buffer = Some(Buffer::new(&device, INDICES, wgpu::BufferUsages::INDEX, "Index Buffer"));
+        let vertex_buffer = Buffer::new(
+            &device,
+            VERTICES,
+            wgpu::BufferUsages::VERTEX,
+            "Vertex buffer",
+        );
+        let index_buffer = Some(Buffer::new(
+            &device,
+            INDICES,
+            wgpu::BufferUsages::INDEX,
+            "Index Buffer",
+        ));
 
         Self {
             window,
@@ -106,8 +121,9 @@ impl State {
             render_pipeline,
             vertex_buffer,
             index_buffer,
-            // diffuse_bind_group,
-            // diffuse_texture,
+            num_vertices,
+            use_color, // diffuse_bind_group,
+                       // diffuse_texture,
         }
     }
 
@@ -130,17 +146,17 @@ impl State {
 
     pub fn input(&mut self, event: &WindowEvent) -> bool {
         match event {
-            &WindowEvent::KeyboardInput {
+            WindowEvent::KeyboardInput {
                 // Challenge tutorial Pipeline
                 input:
                     KeyboardInput {
-                        state: ElementState::Pressed,
+                        state: ElementState::Released,
                         virtual_keycode: Some(VirtualKeyCode::Space),
                         ..
                     },
                 ..
-            } => false,
-            &WindowEvent::CursorMoved {
+            } => true,
+            WindowEvent::CursorMoved {
                 // Challenge tutorial Surface
                 position: winit::dpi::PhysicalPosition { x, y },
                 ..
@@ -184,7 +200,7 @@ impl State {
             self.clear_color,
             &self.vertex_buffer,
             &self.index_buffer,
-            // &self.diffuse_bind_group,
+            self.num_vertices, // &self.diffuse_bind_group,
         );
 
         // submit will accept anything that implements IntoIter
