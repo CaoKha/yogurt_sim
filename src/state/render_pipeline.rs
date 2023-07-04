@@ -9,7 +9,7 @@ impl RenderPipeline {
     pub fn new(
         device: &wgpu::Device,
         config: &wgpu::SurfaceConfiguration,
-        bind_group_layouts: &[&wgpu::BindGroupLayout],
+        // bind_group_layouts: &[&wgpu::BindGroupLayout],
     ) -> Self {
         let shader = device.create_shader_module(wgpu::include_wgsl!("triangle.wgsl"));
 
@@ -19,7 +19,7 @@ impl RenderPipeline {
             &shader,
             "vs_main",
             "fs_main",
-            bind_group_layouts,
+            // bind_group_layouts,
         );
 
         RenderPipeline { render_pipeline }
@@ -32,7 +32,7 @@ impl RenderPipeline {
         color: wgpu::Color,
         vertex_buffer: &buffer::Buffer,
         index_buffer: &Option<buffer::Buffer>,
-        diffuse_bind_group: &wgpu::BindGroup,
+        // diffuse_bind_group: &wgpu::BindGroup,
     ) {
         let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
             label: Some("Render Pass"),
@@ -49,18 +49,19 @@ impl RenderPipeline {
 
         render_pass.set_pipeline(&self.render_pipeline);
 
-        render_pass.set_bind_group(0, diffuse_bind_group, &[]);
+        // render_pass.set_bind_group(0, diffuse_bind_group, &[]);
 
-        vertex_buffer.attach_to(&mut render_pass);
-        if let Some(index_buffer) = index_buffer {
-            index_buffer.attach_to(&mut render_pass);
-        }
+        // vertex_buffer.attach_to(&mut render_pass);
+        // if let Some(index_buffer) = index_buffer {
+        //     index_buffer.attach_to(&mut render_pass);
+        // }
 
-        if let Some(index_buffer) = index_buffer {
-            index_buffer.drawn_on(&mut render_pass);
-        } else {
-            vertex_buffer.drawn_on(&mut render_pass);
-        }
+        // if let Some(index_buffer) = index_buffer {
+        //     index_buffer.drawn_on(&mut render_pass);
+        // } else {
+        //     vertex_buffer.drawn_on(&mut render_pass);
+        // }
+        render_pass.draw(0..3, 0..1);
     }
 }
 
@@ -70,11 +71,12 @@ fn init_render_pipeline(
     shader: &wgpu::ShaderModule,
     vertex_entry_point: &str,
     fragment_entry_point: &str,
-    bg_layouts: &[&wgpu::BindGroupLayout],
+    // bg_layouts: &[&wgpu::BindGroupLayout],
 ) -> wgpu::RenderPipeline {
     let render_pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
         label: Some("Render Pipeline layout"),
-        bind_group_layouts: bg_layouts,
+        // bind_group_layouts: bg_layouts,
+        bind_group_layouts: &[],
         push_constant_ranges: &[],
     });
 
@@ -84,14 +86,18 @@ fn init_render_pipeline(
         vertex: wgpu::VertexState {
             module: &shader,
             entry_point: vertex_entry_point,
-            buffers: &[Vertex::desc()],
+            // buffers: &[Vertex::desc()],
+            buffers: &[],
         },
         fragment: Some(wgpu::FragmentState {
             module: &shader,
             entry_point: fragment_entry_point,
             targets: &[Some(wgpu::ColorTargetState {
                 format: config.format,
-                blend: Some(wgpu::BlendState::REPLACE),
+                blend: Some(wgpu::BlendState {
+                    color: wgpu::BlendComponent::REPLACE,
+                    alpha: wgpu::BlendComponent::REPLACE
+                }),
                 write_mask: wgpu::ColorWrites::ALL,
             })],
         }),

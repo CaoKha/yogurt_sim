@@ -45,7 +45,7 @@ pub struct State {
     vertex_buffer: Buffer,
     index_buffer: Option<Buffer>,
 
-    diffuse_bind_group: wgpu::BindGroup, // NEW
+    // diffuse_bind_group: wgpu::BindGroup, // NEW
     // diffuse_texture: texture::Texture,
 }
 
@@ -59,32 +59,34 @@ impl State {
         surface.configure(&device, &config);
 
         // NEW
-        let texture_bind_group_layout = device.create_bind_group_layout(
-            &texture::Texture::bind_group_layout_descriptor("texture_bind_group_layout"),
-        );
+        // let texture_bind_group_layout = device.create_bind_group_layout(
+        //     &texture::Texture::bind_group_layout_descriptor("texture_bind_group_layout"),
+        // );
 
-        let diffuse_bytes = include_bytes!("happy-tree.png"); // CHANGED!
-        let diffuse_texture =
-            texture::Texture::from_bytes(&device, &queue, diffuse_bytes, "happy-tree.png").unwrap(); // CHANGED!
+        // let diffuse_bytes = include_bytes!("happy-tree.png"); // CHANGED!
+        // let diffuse_texture =
+        //     texture::Texture::from_bytes(&device, &queue, diffuse_bytes, "happy-tree.png").unwrap(); // CHANGED!
 
-        let diffuse_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
-            layout: &texture_bind_group_layout,
-            entries: &[
-                wgpu::BindGroupEntry {
-                    binding: 0,
-                    resource: wgpu::BindingResource::TextureView(&diffuse_texture.view),
-                },
-                wgpu::BindGroupEntry {
-                    binding: 1,
-                    resource: wgpu::BindingResource::Sampler(&diffuse_texture.sampler),
-                },
-            ],
-            label: Some("diffuse_bind_group"),
-        });
+        // let diffuse_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
+        //     layout: &texture_bind_group_layout,
+        //     entries: &[
+        //         wgpu::BindGroupEntry {
+        //             binding: 0,
+        //             resource: wgpu::BindingResource::TextureView(&diffuse_texture.view),
+        //         },
+        //         wgpu::BindGroupEntry {
+        //             binding: 1,
+        //             resource: wgpu::BindingResource::Sampler(&diffuse_texture.sampler),
+        //         },
+        //     ],
+        //     label: Some("diffuse_bind_group"),
+        // });
 
         // END NEW
 
-        let render_pipeline = RenderPipeline::new(&device, &config, &[&texture_bind_group_layout]);
+        let render_pipeline = RenderPipeline::new(&device, &config, 
+             // &[&texture_bind_group_layout]
+        );
 
         let clear_color = wgpu::Color::BLACK;
 
@@ -104,7 +106,7 @@ impl State {
             render_pipeline,
             vertex_buffer,
             index_buffer,
-            diffuse_bind_group,
+            // diffuse_bind_group,
             // diffuse_texture,
         }
     }
@@ -143,10 +145,16 @@ impl State {
                 position: winit::dpi::PhysicalPosition { x, y },
                 ..
             } => {
+                // self.clear_color = wgpu::Color {
+                //     r: x / self.size.width as f64,
+                //     g: y / self.size.height as f64,
+                //     b: x * y / (self.size.width as f64 * self.size.height as f64),
+                //     a: 1.0,
+                // };
                 self.clear_color = wgpu::Color {
-                    r: x / self.size.width as f64,
-                    g: y / self.size.height as f64,
-                    b: x * y / (self.size.width as f64 * self.size.height as f64),
+                    r: 0.1,
+                    g: 0.2,
+                    b: 0.3,
                     a: 1.0,
                 };
                 true
@@ -176,7 +184,7 @@ impl State {
             self.clear_color,
             &self.vertex_buffer,
             &self.index_buffer,
-            &self.diffuse_bind_group,
+            // &self.diffuse_bind_group,
         );
 
         // submit will accept anything that implements IntoIter

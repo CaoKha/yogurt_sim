@@ -1,10 +1,10 @@
 # Shader
-## What is a shader
+## What is a shader?
 - vs_main() entry for vertex shader, fs_main() entry for fragment shader
 - `@builtin(position)` -> position in framebuffer space 
 - framebuffer coordinates address the pixels in the framebuffer:
-    * A coordinate that start from top-left (x to the right, y down) 
-    * Related to `Render Passes` and `Rasterization`
+    - A coordinate that start from top-left (x to the right, y down) 
+    - Related to `Render Passes` and `Rasterization`
 - `clip_position` (analogous to GLSL `gl_Position`)
 - clip coordinates is vec4
 - `var` is mut but statically type
@@ -70,11 +70,18 @@ fn init_render_pipeline(
 - `buffers` tells `wgpu` type of vertices
 - `targets` tells `wgpu` set up color of the output (`color_state`)
 - `primitive` interpret vertices, converting them into triangles
-    * `PrimitiveTopology::TriangleList`: 3 vertices = 1 triangle
-    * `FrontFace::Ccw`: triangle faceing forward if vertices in counter-clockwise direction
-    *  Triangles not facing forward are "culled" -> not included in the render (`CullMode::Back`)
+    - `PrimitiveTopology::TriangleList`: 3 vertices = 1 triangle
+    - `FrontFace::Ccw`: triangle faceing forward if vertices in counter-clockwise direction
+    -  Triangles not facing forward are "culled" -> not included in the render (`CullMode::Back`)
 - `depth_stencil`: depth/stencil buffer
-- `count`: -> multisampling
-- `mask`: which sample is active -> !0 (bitwise of 0b0000 ... (u64) -> 0b1111 ... = u64::MAX {2<sup>64</sup> -1})
+- `mmultisample`:
+    - `count`: -> how many multisampling
+    - `mask`: which sample is active -> !0 (bitwise of 0b0000 ... u64) -> 0b1111 ... = u64::MAX {2<sup>64</sup> -1})
+    - `alpha_to_coverage_enabled`: -> anti-aliasing
+- `multiview`: how many array layers of texture
+### Shader WGSL file notes:
+- bitwise operator `&`: and
+- 1u = 1 unsigned = 0b0001
+## What is a buffer?
+- data stored <ins>sequentially</ins> in memory.
 
-    
