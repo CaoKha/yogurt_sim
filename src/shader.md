@@ -170,5 +170,43 @@ const INDICES: &[u16] = &[
 ```
 - `VERTICES` (30 elements)-> 120 bytes.
 - `u16` is 2 bytes wide. `INDICES` -> 18 bytes (18 can't devide by 4) -> `wgpu` automatically adds 2 extra bytes to buffer -> 20 bytes ( 20 now can devide by 4)
-- triangle -> vertex[0] , vertex[1], vertex[4] -> A, B, E
+- Example: triangle -> vertex[0] , vertex[1], vertex[4] -> A, B, E
+- You can only have one index buffer set at a time.
+- When use index buffer, need to use `draw_indexed` function
+
+### Color Correction
+![Pink Pentagon](assets/images/color_correction.png)
+- Hex value: `#BC00BC` -> convert RGB: `(188, 0 , 188)` -> divide by 255 -> `(0.737254902, 0, 0.737254902)` -> not the same as our vertex colors which is `(0.5, 0.0, 0.5)`
+- Most monitor use sRGB (depend on what is returned from `surface.get_preferred_format()` using sRGB texture format)
+- to get correct color: `srgb_color = ((rgb_color / 255 + 0.055) / 1.055 ) ^ 2.4`
+- vertices and indices for a star shape (notes: triangle formed by vertices <ins>counter-clockwise</ins>):
+```rust,noplayground
+#[rustfmt::skip]
+const VERTICES_STAR: &[Vertex] = &[
+    Vertex { position: [0.0, 0.5, 0.0], color: [1.0, 0.0, 0.5] }, // A
+    Vertex { position: [0.15, 0.15, 0.0], color: [0.5, 1.0, 0.5] }, // B
+    Vertex { position: [0.5, 0.0, 0.0], color: [0.5, 1.0, 0.5] }, // C
+    Vertex { position: [0.25, -0.25, 0.0], color: [0.5, 0.0, 0.5] }, // D
+    Vertex { position: [0.3, -0.5, 0.0], color: [0.5, 1.0, 0.5] }, // E
+    Vertex { position: [0.0, -0.25, 0.0], color: [0.5, 1.0, 0.5] }, // F
+    Vertex { position: [-0.3, -0.5, 0.0], color: [0.5, 0.0, 0.5] }, // G
+    Vertex { position: [-0.25, -0.25, 0.0], color: [0.5, 0.0, 0.5] }, // H
+    Vertex { position: [-0.5, 0.0, 0.0], color: [0.5, 1.0, 0.5] }, // I
+    Vertex { position: [-0.15, 0.15, 0.0], color: [0.5, 1.0, 0.5] }, // J
+];
+
+#[rustfmt::skip]
+const INDICES_STAR: &[u16] = &[
+    0, 9, 1,
+    1, 3, 2,
+    3, 5, 4,
+    7, 6, 5,
+    9, 8, 7,
+    1, 9, 3,
+    9, 5, 3,
+    9, 7, 5,
+];
+```
+
+![Pink Star](assets/images/star.png)
 
