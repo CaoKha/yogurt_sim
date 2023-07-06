@@ -92,7 +92,7 @@ pub struct State {
     // num_vertices: u32,
     num_indices: u32,
     use_color: bool,
-    // diffuse_bind_group: wgpu::BindGroup, // NEW
+    diffuse_bind_group: wgpu::BindGroup, // NEW
 }
 
 impl State {
@@ -109,35 +109,35 @@ impl State {
         surface.configure(&device, &config);
 
         // NEW
-        // let texture_bind_group_layout = device.create_bind_group_layout(
-        //     &texture::Texture::bind_group_layout_descriptor("texture_bind_group_layout"),
-        // );
+        let texture_bind_group_layout = device.create_bind_group_layout(
+            &texture::Texture::bind_group_layout_descriptor("texture_bind_group_layout"),
+        );
 
-        // let diffuse_bytes = include_bytes!("happy-tree.png"); // CHANGED!
-        // let diffuse_texture =
-        //     texture::Texture::from_bytes(&device, &queue, diffuse_bytes, "happy-tree.png").unwrap(); // CHANGED!
+        let diffuse_bytes = include_bytes!("happy-tree.png"); // CHANGED!
+        let diffuse_texture =
+            texture::Texture::from_bytes(&device, &queue, diffuse_bytes, "happy-tree.png").unwrap(); // CHANGED!
 
-        // let diffuse_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
-        //     layout: &texture_bind_group_layout,
-        //     entries: &[
-        //         wgpu::BindGroupEntry {
-        //             binding: 0,
-        //             resource: wgpu::BindingResource::TextureView(&diffuse_texture.view),
-        //         },
-        //         wgpu::BindGroupEntry {
-        //             binding: 1,
-        //             resource: wgpu::BindingResource::Sampler(&diffuse_texture.sampler),
-        //         },
-        //     ],
-        //     label: Some("diffuse_bind_group"),
-        // });
+        let diffuse_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
+            layout: &texture_bind_group_layout,
+            entries: &[
+                wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: wgpu::BindingResource::TextureView(&diffuse_texture.view),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 1,
+                    resource: wgpu::BindingResource::Sampler(&diffuse_texture.sampler),
+                },
+            ],
+            label: Some("diffuse_bind_group"),
+        });
 
         // END NEW
 
         let shader = device.create_shader_module(wgpu::include_wgsl!("triangle.wgsl"));
         let render_pipeline = Self::init_render_pipeline(
             &device, &config, &shader, "vs_main", "fs_main",
-            // &[&texture_bind_group_layout],
+            &[&texture_bind_group_layout],
         );
 
         let clear_color = wgpu::Color::BLACK;
@@ -172,7 +172,7 @@ impl State {
             // num_vertices,
             num_indices,
             use_color,
-            // diffuse_bind_group,
+            diffuse_bind_group,
             // diffuse_texture,
         }
     }
@@ -310,16 +310,16 @@ impl State {
 
         // update render pass
         render_pass.set_pipeline(render_pipeline);
-        // render_pass.set_bind_group(0, &self.diffuse_bind_group, &[]);
-        // self.vertex_buffer.attach_to(&mut render_pass);
-        // if let Some(index_buffer) = &self.index_buffer {
-        //     index_buffer.attach_to(&mut render_pass);
-        // }
-        // if let Some(index_buffer) = &self.index_buffer {
-        //     index_buffer.drawn_on(&mut render_pass);
-        // } else {
-        //     self.vertex_buffer.drawn_on(&mut render_pass);
-        // }
+        render_pass.set_bind_group(0, &self.diffuse_bind_group, &[]);
+        self.vertex_buffer.attach_to(&mut render_pass);
+        if let Some(index_buffer) = &self.index_buffer {
+            index_buffer.attach_to(&mut render_pass);
+        }
+        if let Some(index_buffer) = &self.index_buffer {
+            index_buffer.drawn_on(&mut render_pass);
+        } else {
+            self.vertex_buffer.drawn_on(&mut render_pass);
+        }
 
         render_pass.set_vertex_buffer(0, (self.vertex_buffer.buffer).slice(..));
         if let Some(id_buffer) = &self.index_buffer {

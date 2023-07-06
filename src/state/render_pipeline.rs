@@ -7,13 +7,13 @@ impl State {
         shader: &wgpu::ShaderModule,
         vertex_entry_point: &str,
         fragment_entry_point: &str,
-        // bg_layouts: &[&wgpu::BindGroupLayout],
+        bg_layouts: &[&wgpu::BindGroupLayout],
     ) -> wgpu::RenderPipeline {
         let render_pipeline_layout =
             device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
                 label: Some("Render Pipeline layout"),
-                // bind_group_layouts: bg_layouts,
-                bind_group_layouts: &[],
+                bind_group_layouts: bg_layouts,
+                // bind_group_layouts: &[],
                 push_constant_ranges: &[],
             });
 
@@ -23,7 +23,6 @@ impl State {
             vertex: wgpu::VertexState {
                 module: &shader,
                 entry_point: vertex_entry_point,
-                // buffers: &[Vertex::desc()],
                 buffers: &[Vertex::desc()],
             },
             fragment: Some(wgpu::FragmentState {
