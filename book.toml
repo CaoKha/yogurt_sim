@@ -1,0 +1,6 @@
+[book]
+authors = ["CaoKha"]
+language = "en"
+multilingual = false
+src = "src"
+title = "Yogurt Simulation Notes"
