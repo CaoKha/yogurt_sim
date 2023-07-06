@@ -26,7 +26,7 @@ mod texture;
 // ];
 
 #[rustfmt::skip]
-const VERTICES_TRIANGLE: &[Vertex] = &[
+const VERTICES_PENTAGON: &[Vertex] = &[
     Vertex { position: [-0.0868241, 0.49240386, 0.0], color: [0.5, 0.0, 0.5] }, // A
     Vertex { position: [-0.49513406, 0.06958647, 0.0], color: [0.5, 0.0, 0.5] }, // B
     Vertex { position: [-0.21918549, -0.44939706, 0.0], color: [0.5, 0.0, 0.5] }, // C
@@ -48,14 +48,14 @@ const VERTICES_TRIANGLE: &[Vertex] = &[
 const VERTICES_STAR: &[Vertex] = &[
     Vertex { position: [0.0, 0.5, 0.0], color: [1.0, 0.0, 0.5] }, // A
     Vertex { position: [0.15, 0.15, 0.0], color: [0.5, 1.0, 0.5] }, // B
-    Vertex { position: [0.5, 0.0, 0.0], color: [0.5, 1.0, 0.5] }, // E
-    Vertex { position: [0.25, -0.25, 0.0], color: [0.5, 0.0, 0.5] }, // E
-    Vertex { position: [0.3, -0.5, 0.0], color: [0.5, 1.0, 0.5] }, // C
-    Vertex { position: [0.0, -0.25, 0.0], color: [0.5, 1.0, 0.5] }, // A
-    Vertex { position: [-0.3, -0.5, 0.0], color: [0.5, 0.0, 0.5] }, // D
-    Vertex { position: [-0.25, -0.25, 0.0], color: [0.5, 0.0, 0.5] }, // B
-    Vertex { position: [-0.5, 0.0, 0.0], color: [0.5, 1.0, 0.5] }, // C
-    Vertex { position: [-0.15, 0.15, 0.0], color: [0.5, 1.0, 0.5] }, // D
+    Vertex { position: [0.5, 0.0, 0.0], color: [0.5, 1.0, 0.5] }, // C
+    Vertex { position: [0.25, -0.25, 0.0], color: [0.5, 0.0, 0.5] }, // D
+    Vertex { position: [0.3, -0.5, 0.0], color: [0.5, 1.0, 0.5] }, // E
+    Vertex { position: [0.0, -0.25, 0.0], color: [0.5, 1.0, 0.5] }, // F
+    Vertex { position: [-0.3, -0.5, 0.0], color: [0.5, 0.0, 0.5] }, // G
+    Vertex { position: [-0.25, -0.25, 0.0], color: [0.5, 0.0, 0.5] }, // H
+    Vertex { position: [-0.5, 0.0, 0.0], color: [0.5, 1.0, 0.5] }, // I
+    Vertex { position: [-0.15, 0.15, 0.0], color: [0.5, 1.0, 0.5] }, // J
 ];
 
 #[rustfmt::skip]
@@ -144,7 +144,7 @@ impl State {
 
         let vertex_buffer = Buffer::new(
             &device,
-            VERTICES_TRIANGLE,
+            VERTICES_PENTAGON,
             wgpu::BufferUsages::VERTEX,
             "Vertex Buffer",
         );
@@ -237,7 +237,7 @@ impl State {
             true => {
                 self.vertex_buffer = Buffer::new(
                     &self.device,
-                    VERTICES_TRIANGLE,
+                    VERTICES_PENTAGON,
                     wgpu::BufferUsages::VERTEX,
                     "Vertex Buffer",
                 );
