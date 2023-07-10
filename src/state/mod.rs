@@ -6,77 +6,7 @@ mod surface;
 mod vertex;
 use vertex::Vertex;
 mod texture;
-
-// #[rustfmt::skip]
-// const VERTICES: &[Vertex] = &[
-//     Vertex { position: [-0.0868241, 0.49240386, 0.0], tex_coords: [0.4131759, 0.00759614], }, // A
-//     Vertex { position: [-0.49513406, 0.06958647, 0.0], tex_coords: [0.0048659444, 0.43041354], }, // B
-//     Vertex { position: [-0.21918549, -0.44939706, 0.0], tex_coords: [0.28081453, 0.949397], }, // C
-//     Vertex { position: [0.35966998, -0.3473291, 0.0], tex_coords: [0.85967, 0.84732914], }, // D
-//     Vertex { position: [0.44147372, 0.2347359, 0.0], tex_coords: [0.9414737, 0.2652641], }, // E
-// ];
-
-// #[rustfmt::skip]
-// const VERTICES_ROT_90: &[Vertex] = &[
-//     Vertex { position: [-0.0868241, 0.49240386, 0.0], tex_coords: [0.00759614, 0.4131759] }, // A
-//     Vertex { position: [-0.49513406, 0.06958647, 0.0], tex_coords: [0.43041354, 0.0048659444] }, // B
-//     Vertex { position: [-0.21918549, -0.44939706, 0.0], tex_coords: [0.949397, 0.28081453] }, // C
-//     Vertex { position: [0.35966998, -0.3473291, 0.0], tex_coords: [0.84732914, 0.85967] }, // D
-//     Vertex { position: [0.44147372, 0.2347359, 0.0], tex_coords: [0.2652641, 0.9414737] }, // E
-// ];
-
-#[rustfmt::skip]
-const VERTICES_PENTAGON: &[Vertex] = &[
-    Vertex { position: [-0.0868241, 0.49240386, 0.0], color: [0.5, 0.0, 0.5] }, // A
-    Vertex { position: [-0.49513406, 0.06958647, 0.0], color: [0.5, 0.0, 0.5] }, // B
-    Vertex { position: [-0.21918549, -0.44939706, 0.0], color: [0.5, 0.0, 0.5] }, // C
-    Vertex { position: [0.35966998, -0.3473291, 0.0], color: [0.5, 0.0, 0.5] }, // D
-    Vertex { position: [0.44147372, 0.2347359, 0.0], color: [0.5, 0.0, 0.5] }, // E
-];
-
-// #[rustfmt::skip]
-// const VERTICES_TRIANGLE_DIF_COLOR: &[Vertex] = &[
-//     Vertex { position: [-0.568241, 0.49240386, 0.0], color: [1.0, 0.0, 0.5] }, // A
-//     Vertex { position: [-0.49513406, 0.6958647, 0.0], color: [0.5, 1.0, 0.5] }, // B
-//     Vertex { position: [-0.21918549, -0.44939706, 0.0], color: [0.5, 0.0, 1.0] }, // C
-//     Vertex { position: [0.35966998, -0.3473291, 0.0], color: [0.1, 0.0, 0.5] }, // D
-//     Vertex { position: [0.44147372, 0.2347359, 0.0], color: [0.5, 0.1, 0.5] }, // E
-//     Vertex { position: [0.54147372, 0.5347359, 0.0], color: [0.5, 0.1, 0.5] }, // E
-// ];
-
-#[rustfmt::skip]
-const VERTICES_STAR: &[Vertex] = &[
-    Vertex { position: [0.0, 0.5, 0.0], color: [1.0, 0.0, 0.5] }, // A
-    Vertex { position: [0.15, 0.15, 0.0], color: [0.5, 1.0, 0.5] }, // B
-    Vertex { position: [0.5, 0.0, 0.0], color: [0.5, 1.0, 0.5] }, // C
-    Vertex { position: [0.25, -0.25, 0.0], color: [0.5, 0.0, 0.5] }, // D
-    Vertex { position: [0.3, -0.5, 0.0], color: [0.5, 1.0, 0.5] }, // E
-    Vertex { position: [0.0, -0.25, 0.0], color: [0.5, 1.0, 0.5] }, // F
-    Vertex { position: [-0.3, -0.5, 0.0], color: [0.5, 0.0, 0.5] }, // G
-    Vertex { position: [-0.25, -0.25, 0.0], color: [0.5, 0.0, 0.5] }, // H
-    Vertex { position: [-0.5, 0.0, 0.0], color: [0.5, 1.0, 0.5] }, // I
-    Vertex { position: [-0.15, 0.15, 0.0], color: [0.5, 1.0, 0.5] }, // J
-];
-
-#[rustfmt::skip]
-const INDICES: &[u16] = &[
-    0, 1, 4,
-    1, 2, 4,
-    2, 3, 4,
-];
-
-
-#[rustfmt::skip]
-const INDICES_STAR: &[u16] = &[
-    0, 9, 1,
-    1, 3, 2,
-    3, 5, 4,
-    7, 6, 5,
-    9, 8, 7,
-    1, 9, 3,
-    9, 5, 3,
-    9, 7, 5,
-];
+use texture::Texture;
 
 pub struct State {
     window: Window,
@@ -89,18 +19,19 @@ pub struct State {
     render_pipeline: wgpu::RenderPipeline,
     vertex_buffer: Buffer,
     index_buffer: Option<Buffer>,
-    // num_vertices: u32,
+    num_vertices: u32,
     num_indices: u32,
     use_color: bool,
-    diffuse_bind_group: wgpu::BindGroup, // NEW
+    default_texture: Texture,
+    bind_group: wgpu::BindGroup, // NEW
+    texture_bind_group_layout: wgpu::BindGroupLayout,
 }
 
 impl State {
     // Creating some of the wgpu types requires async code
     pub async fn new(window: Window) -> Self {
         let size = window.inner_size();
-        // let num_vertices = VERTICES.len() as u32;
-        // let num_vertices = VERTICES_TRIANGLE.len() as u32;
+        let num_vertices = Vertex::VERTICES_PENTAGON.len() as u32;
         let use_color = true;
 
         let (surface, adapter) = Self::init_surface(&window).await;
@@ -110,13 +41,13 @@ impl State {
 
         // NEW
         let texture_bind_group_layout = device.create_bind_group_layout(
-            &texture::Texture::bind_group_layout_descriptor("texture_bind_group_layout"),
+            &Texture::bind_group_layout_descriptor("texture_bind_group_layout"),
         );
 
+        // diffuse texture
         let diffuse_bytes = include_bytes!("happy-tree.png"); // CHANGED!
         let diffuse_texture =
-            texture::Texture::from_bytes(&device, &queue, diffuse_bytes, "happy-tree.png").unwrap(); // CHANGED!
-
+            Texture::from_bytes(&device, &queue, diffuse_bytes, "happy-tree").unwrap(); // CHANGED!
         let diffuse_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
             layout: &texture_bind_group_layout,
             entries: &[
@@ -134,9 +65,13 @@ impl State {
 
         // END NEW
 
-        let shader = device.create_shader_module(wgpu::include_wgsl!("triangle.wgsl"));
+        let shader = device.create_shader_module(wgpu::include_wgsl!("shader.wgsl"));
         let render_pipeline = Self::init_render_pipeline(
-            &device, &config, &shader, "vs_main", "fs_main",
+            &device,
+            &config,
+            &shader,
+            "vs_main",
+            "fs_main",
             &[&texture_bind_group_layout],
         );
 
@@ -144,19 +79,19 @@ impl State {
 
         let vertex_buffer = Buffer::new(
             &device,
-            VERTICES_PENTAGON,
+            Vertex::VERTICES_PENTAGON,
             wgpu::BufferUsages::VERTEX,
             "Vertex Buffer",
         );
 
         let index_buffer = Some(Buffer::new(
             &device,
-            INDICES,
+            Vertex::INDICES,
             wgpu::BufferUsages::INDEX,
             "Index Buffer",
         ));
 
-        let num_indices = INDICES.len() as u32;
+        let num_indices = Vertex::INDICES.len() as u32;
 
         Self {
             window,
@@ -169,11 +104,12 @@ impl State {
             render_pipeline,
             vertex_buffer,
             index_buffer,
-            // num_vertices,
+            num_vertices,
             num_indices,
             use_color,
-            diffuse_bind_group,
-            // diffuse_texture,
+            default_texture: diffuse_texture,
+            bind_group: diffuse_bind_group,
+            texture_bind_group_layout,
         }
     }
 
@@ -233,36 +169,81 @@ impl State {
     }
 
     pub fn update(&mut self) {
+        let angle = std::f32::consts::PI;
+        let new_vertex = Vertex::rotate_vertex(angle, Vertex::VERTICES_PENTAGON);
+        // let num_triangles = self.num_vertices - 2;
+        // let new_indices = (1u16..num_triangles as u16 + 1)
+        //     .into_iter()
+        //     .flat_map(|i| vec![i + 1, i, 0])
+        //     .collect::<Vec<_>>();
+        let new_indices = Vertex::INDICES;
+
+        let cartoon_bytes = include_bytes!("happy-tree-cartoon.png");
+        let cartoon_texture = Texture::from_bytes(
+            &self.device,
+            &self.queue,
+            cartoon_bytes,
+            "happy-tree-cartoon",
+        ).unwrap();
+
         match self.use_color {
             true => {
                 self.vertex_buffer = Buffer::new(
                     &self.device,
-                    VERTICES_PENTAGON,
+                    Vertex::VERTICES_PENTAGON,
                     wgpu::BufferUsages::VERTEX,
                     "Vertex Buffer",
                 );
                 self.index_buffer = Some(Buffer::new(
                     &self.device,
-                    INDICES,
+                    Vertex::INDICES,
                     wgpu::BufferUsages::INDEX,
                     "Index Buffer",
                 ));
-                self.num_indices = INDICES.len() as u32;
+                self.num_indices = Vertex::INDICES.len() as u32;
+                self.bind_group = self.device.create_bind_group(&wgpu::BindGroupDescriptor {
+                    layout: &self.texture_bind_group_layout,
+                    entries: &[
+                        wgpu::BindGroupEntry {
+                            binding: 0,
+                            resource: wgpu::BindingResource::TextureView(&self.default_texture.view),
+                        },
+                        wgpu::BindGroupEntry {
+                            binding: 1,
+                            resource: wgpu::BindingResource::Sampler(&self.default_texture.sampler),
+                        },
+                    ],
+                    label: Some("diffuse_bind_group"),
+                });
             }
             false => {
                 self.vertex_buffer = Buffer::new(
                     &self.device,
-                    VERTICES_STAR,
+                    &new_vertex,
                     wgpu::BufferUsages::VERTEX,
                     "Challenge Vertex Buffer",
                 );
                 self.index_buffer = Some(Buffer::new(
                     &self.device,
-                    INDICES_STAR,
+                    &new_indices,
                     wgpu::BufferUsages::INDEX,
                     "Index Buffer",
                 ));
-                self.num_indices = INDICES_STAR.len() as u32;
+                self.num_indices = new_indices.len() as u32;
+                self.bind_group = self.device.create_bind_group(&wgpu::BindGroupDescriptor {
+                    layout: &self.texture_bind_group_layout,
+                    entries: &[
+                        wgpu::BindGroupEntry {
+                            binding: 0,
+                            resource: wgpu::BindingResource::TextureView(&cartoon_texture.view),
+                        },
+                        wgpu::BindGroupEntry {
+                            binding: 1,
+                            resource: wgpu::BindingResource::Sampler(&cartoon_texture.sampler),
+                        },
+                    ],
+                    label: Some("diffuse_bind_group"),
+                });
             }
         };
 
@@ -310,7 +291,7 @@ impl State {
 
         // update render pass
         render_pass.set_pipeline(render_pipeline);
-        render_pass.set_bind_group(0, &self.diffuse_bind_group, &[]);
+        render_pass.set_bind_group(0, &self.bind_group, &[]);
         self.vertex_buffer.attach_to(&mut render_pass);
         if let Some(index_buffer) = &self.index_buffer {
             index_buffer.attach_to(&mut render_pass);
