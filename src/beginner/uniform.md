@@ -19,4 +19,36 @@ Keep in mind that different conventions and frameworks may use different layouts
 - The `view` matrix move the world to be at the position and rotationof the camera. It's essentially an inverse of whatever the transform matrix of the camera would be.
 - The `proj` matrix warps th scene to give the effect of depth.
 - The coordinate system in Wgpu is based on DirectX, and Metal's coordinate systems. That means that in `normalized device coordinates` 
+#### Perspective Projection Matrix
+<a href="https://www.scratchapixel.com/lessons/3d-basic-rendering/perspective-and-orthographic-projection-matrix/building-basic-perspective-projection-matrix.html" target="_blank">How perspective matrix is created?</a>
+<br/>
+<a href="https://carmencincotti.com/2022-05-02/homogeneous-coordinates-clip-space-ndc/" target="_blank">We use these convetion and formula</a>
+##### Formula view matrix:
+```rust,noplayground
+view = [
+    right.x,    right.y,    right.z,    -dot(right, eye)
+    up.x,       up.y,       up.z,       -dot(up, eye)
+    -forward.x, -forward.y, -forward.z, dot(forward, eye)
+    0,          0,          0,          1
+]
+```
+In this formula: 
+
++ `right` (x_camera) represents the camera's right vector.
++ `up` (y_camera) represents the camera's up vector.    
++ `forward` (z_camera) represents the camera's forward vector.
++ `eye` represents the camera's position (eye point) in world space.
+
+
+##### Formula projection matrix:
+```rust,noplayground
+proj = [
+    (1 / (aspect * tan(FOVY/2))),    0,                     0,                                0
+    0,                             (1 / tan(FOVY/2)),        0,                                0
+    0,                             0,                      -(zfar + znear) / (zfar - znear),  -(2 * zfar * znear) / (zfar - znear)
+    0,                             0,                      -1,                               0
+]
+```
+
+
 
