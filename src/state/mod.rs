@@ -1,12 +1,13 @@
+use wgpu::util::DeviceExt;
 use winit::{event::*, window::Window};
-mod buffer;
-use buffer::Buffer;
-mod render_pipeline;
-mod surface;
-mod vertex;
-use vertex::Vertex;
-mod texture;
-use texture::Texture;
+mod builder;
+mod components;
+use components::{
+    buffer::Buffer,
+    camera::{Camera, CameraController, CameraUniform},
+    texture::Texture,
+    vertex::Vertex,
+};
 
 pub struct State {
     window: Window,
@@ -19,71 +20,62 @@ pub struct State {
     render_pipeline: wgpu::RenderPipeline,
     vertex_buffer: Buffer,
     index_buffer: Option<Buffer>,
-    num_vertices: u32,
+    camera_buffer: wgpu::Buffer,
+    // num_vertices: u32,
     num_indices: u32,
-    use_color: bool,
+    bool_event: bool,
     default_texture: Texture,
-    bind_group: wgpu::BindGroup, // NEW
+    cartoon_texture: Texture,
+    texture_bind_group: wgpu::BindGroup, // NEW
+    camera_bind_group: wgpu::BindGroup,
     texture_bind_group_layout: wgpu::BindGroupLayout,
+    camera: Camera,
+    camera_controller: CameraController,
+    camera_uniform: CameraUniform,
 }
 
 impl State {
     // Creating some of the wgpu types requires async code
     pub async fn new(window: Window) -> Self {
-        let size = window.inner_size();
-        let num_vertices = Vertex::VERTICES_PENTAGON.len() as u32;
-        let use_color = true;
-
+        // Window's config
+        let window_size = window.inner_size();
         let (surface, adapter) = Self::init_surface(&window).await;
+        let config = Self::init_surface_config(window_size, &surface, &adapter);
         let (device, queue) = Self::init_device(&adapter).await;
-        let config = Self::init_config(size, &surface, &adapter);
         surface.configure(&device, &config);
 
-        // NEW
-        let texture_bind_group_layout = device.create_bind_group_layout(
-            &Texture::bind_group_layout_descriptor("texture_bind_group_layout"),
-        );
+        // State's properties init
+        let bool_event = true;
+        let num_indices = Vertex::INDICES.len() as u32;
 
-        // diffuse texture
-        let diffuse_bytes = include_bytes!("happy-tree.png"); // CHANGED!
+        // Textures
+        let diffuse_bytes = include_bytes!("../../assets/happy-tree.png");
         let diffuse_texture =
-            Texture::from_bytes(&device, &queue, diffuse_bytes, "happy-tree").unwrap(); // CHANGED!
-        let diffuse_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
-            layout: &texture_bind_group_layout,
-            entries: &[
-                wgpu::BindGroupEntry {
-                    binding: 0,
-                    resource: wgpu::BindingResource::TextureView(&diffuse_texture.view),
-                },
-                wgpu::BindGroupEntry {
-                    binding: 1,
-                    resource: wgpu::BindingResource::Sampler(&diffuse_texture.sampler),
-                },
-            ],
-            label: Some("diffuse_bind_group"),
-        });
-
-        // END NEW
-
-        let shader = device.create_shader_module(wgpu::include_wgsl!("shader.wgsl"));
-        let render_pipeline = Self::init_render_pipeline(
+            Texture::get_texture_from_bytes(&device, &queue, diffuse_bytes, "happy-tree-diffuse");
+        let cartoon_bytes = include_bytes!("../../assets/happy-tree-cartoon.png");
+        let cartoon_texture =
+            Texture::get_texture_from_bytes(&device, &queue, cartoon_bytes, "happy-tree-cartoon");
+        // Texture's bindgroup layout
+        let texture_bind_group_layout =
+            device.create_bind_group_layout(&Texture::get_bind_group_layout_descriptor());
+        // Texture's bindgroup
+        let diffuse_bind_group = Texture::init_texture_bind_group(
             &device,
-            &config,
-            &shader,
-            "vs_main",
-            "fs_main",
-            &[&texture_bind_group_layout],
+            &diffuse_texture,
+            &texture_bind_group_layout,
+            "diffuse_texture_bind_group",
         );
 
-        let clear_color = wgpu::Color::BLACK;
+        // Shaders
+        let shader = device.create_shader_module(wgpu::include_wgsl!("../shaders/shader.wgsl"));
 
+        // Buffers
         let vertex_buffer = Buffer::new(
             &device,
             Vertex::VERTICES_PENTAGON,
             wgpu::BufferUsages::VERTEX,
             "Vertex Buffer",
         );
-
         let index_buffer = Some(Buffer::new(
             &device,
             Vertex::INDICES,
@@ -91,7 +83,39 @@ impl State {
             "Index Buffer",
         ));
 
-        let num_indices = Vertex::INDICES.len() as u32;
+        // Camera
+        let camera = Camera::new(&config);
+        let camera_controller = CameraController::new(0.2);
+        // Camera's Matrix
+        let mut camera_uniform = CameraUniform::new();
+        camera_uniform.update_view_proj(&camera);
+        // Camera's buffer
+        let camera_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: Some("Camera Buffer"),
+            contents: bytemuck::cast_slice(&[camera_uniform]),
+            usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
+        });
+        // Camera's bindgroup layout
+        let camera_bind_group_layout =
+            device.create_bind_group_layout(&Camera::get_camera_bindgroup_layout_descriptor());
+        // Camera's bindgroup
+        let camera_bind_group = Camera::init_camera_bind_group(
+            &device,
+            &camera_bind_group_layout,
+            "camera_bind_group",
+            &camera_buffer,
+        );
+
+        // Render Pipeline
+        let render_pipeline = Self::init_render_pipeline(
+            &device,
+            &config,
+            &shader,
+            "vs_main",
+            "fs_main",
+            &[&texture_bind_group_layout, &camera_bind_group_layout],
+        );
+
 
         Self {
             window,
@@ -99,17 +123,22 @@ impl State {
             device,
             queue,
             config,
-            size,
-            clear_color,
+            size: window_size,
+            clear_color: wgpu::Color::BLACK,
             render_pipeline,
             vertex_buffer,
             index_buffer,
-            num_vertices,
             num_indices,
-            use_color,
+            bool_event,
             default_texture: diffuse_texture,
-            bind_group: diffuse_bind_group,
+            cartoon_texture,
+            texture_bind_group: diffuse_bind_group,
+            camera_bind_group,
             texture_bind_group_layout,
+            camera,
+            camera_controller,
+            camera_uniform,
+            camera_buffer,
         }
     }
 
@@ -131,6 +160,7 @@ impl State {
     }
 
     pub fn input(&mut self, event: &WindowEvent) -> bool {
+        self.camera_controller.process_events(event);
         match event {
             WindowEvent::KeyboardInput {
                 // Challenge tutorial Pipeline
@@ -142,7 +172,7 @@ impl State {
                     },
                 ..
             } => {
-                self.use_color = *state == ElementState::Released;
+                self.bool_event = *state == ElementState::Released;
                 true
             }
             WindowEvent::CursorMoved {
@@ -169,24 +199,20 @@ impl State {
     }
 
     pub fn update(&mut self) {
+        // update camera
+        self.camera_controller.update_camera(&mut self.camera);
+        self.camera_uniform.update_view_proj(&self.camera);
+        self.queue.write_buffer(
+            &self.camera_buffer,
+            0,
+            bytemuck::cast_slice(&[self.camera_uniform]),
+        );
+
+        // update texture via `bool_event`
         let angle = std::f32::consts::PI;
         let new_vertex = Vertex::rotate_vertex(angle, Vertex::VERTICES_PENTAGON);
-        // let num_triangles = self.num_vertices - 2;
-        // let new_indices = (1u16..num_triangles as u16 + 1)
-        //     .into_iter()
-        //     .flat_map(|i| vec![i + 1, i, 0])
-        //     .collect::<Vec<_>>();
         let new_indices = Vertex::INDICES;
-
-        let cartoon_bytes = include_bytes!("happy-tree-cartoon.png");
-        let cartoon_texture = Texture::from_bytes(
-            &self.device,
-            &self.queue,
-            cartoon_bytes,
-            "happy-tree-cartoon",
-        ).unwrap();
-
-        match self.use_color {
+        match self.bool_event {
             true => {
                 self.vertex_buffer = Buffer::new(
                     &self.device,
@@ -201,20 +227,12 @@ impl State {
                     "Index Buffer",
                 ));
                 self.num_indices = Vertex::INDICES.len() as u32;
-                self.bind_group = self.device.create_bind_group(&wgpu::BindGroupDescriptor {
-                    layout: &self.texture_bind_group_layout,
-                    entries: &[
-                        wgpu::BindGroupEntry {
-                            binding: 0,
-                            resource: wgpu::BindingResource::TextureView(&self.default_texture.view),
-                        },
-                        wgpu::BindGroupEntry {
-                            binding: 1,
-                            resource: wgpu::BindingResource::Sampler(&self.default_texture.sampler),
-                        },
-                    ],
-                    label: Some("diffuse_bind_group"),
-                });
+                self.texture_bind_group = Texture::init_texture_bind_group(
+                    &self.device,
+                    &self.default_texture,
+                    &self.texture_bind_group_layout,
+                    "diffuse_texture_bind_group",
+                );
             }
             false => {
                 self.vertex_buffer = Buffer::new(
@@ -230,24 +248,14 @@ impl State {
                     "Index Buffer",
                 ));
                 self.num_indices = new_indices.len() as u32;
-                self.bind_group = self.device.create_bind_group(&wgpu::BindGroupDescriptor {
-                    layout: &self.texture_bind_group_layout,
-                    entries: &[
-                        wgpu::BindGroupEntry {
-                            binding: 0,
-                            resource: wgpu::BindingResource::TextureView(&cartoon_texture.view),
-                        },
-                        wgpu::BindGroupEntry {
-                            binding: 1,
-                            resource: wgpu::BindingResource::Sampler(&cartoon_texture.sampler),
-                        },
-                    ],
-                    label: Some("diffuse_bind_group"),
-                });
+                self.texture_bind_group = Texture::init_texture_bind_group(
+                    &self.device,
+                    &self.cartoon_texture,
+                    &self.texture_bind_group_layout,
+                    "cartoon_texture_bind_group",
+                );
             }
         };
-
-        // todo!()
     }
 
     pub fn render(&mut self) -> Result<(), wgpu::SurfaceError> {
@@ -291,7 +299,8 @@ impl State {
 
         // update render pass
         render_pass.set_pipeline(render_pipeline);
-        render_pass.set_bind_group(0, &self.bind_group, &[]);
+        render_pass.set_bind_group(0, &self.texture_bind_group, &[]);
+        render_pass.set_bind_group(1, &self.camera_bind_group, &[]);
         self.vertex_buffer.attach_to(&mut render_pass);
         if let Some(index_buffer) = &self.index_buffer {
             index_buffer.attach_to(&mut render_pass);

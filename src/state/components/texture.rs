@@ -59,7 +59,8 @@ impl Texture {
             texture_size,
         );
 
-        let diffuse_texture_view = diffuse_texture.create_view(&wgpu::TextureViewDescriptor::default());
+        let diffuse_texture_view =
+            diffuse_texture.create_view(&wgpu::TextureViewDescriptor::default());
         let diffuse_sampler = device.create_sampler(&wgpu::SamplerDescriptor {
             address_mode_u: wgpu::AddressMode::ClampToEdge,
             address_mode_v: wgpu::AddressMode::ClampToEdge,
@@ -77,7 +78,7 @@ impl Texture {
         })
     }
 
-    pub fn bind_group_layout_descriptor(label: &str) -> wgpu::BindGroupLayoutDescriptor {
+    pub fn get_bind_group_layout_descriptor<'desc>() -> wgpu::BindGroupLayoutDescriptor<'desc> {
         wgpu::BindGroupLayoutDescriptor {
             entries: &[
                 wgpu::BindGroupLayoutEntry {
@@ -99,7 +100,39 @@ impl Texture {
                     count: None,
                 },
             ],
-            label: Some(label),
+            label: Some("texture_bind_group_layout"),
         }
+    }
+
+    pub fn init_texture_bind_group(
+        device: &wgpu::Device,
+        texture: &Texture,
+        texture_bind_group_layout: &wgpu::BindGroupLayout,
+        texture_bindgroup_label: &str,
+    ) -> wgpu::BindGroup {
+        let diffuse_bind_group = (*device).create_bind_group(&wgpu::BindGroupDescriptor {
+            layout: texture_bind_group_layout,
+            entries: &[
+                wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: wgpu::BindingResource::TextureView(&texture.view),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 1,
+                    resource: wgpu::BindingResource::Sampler(&texture.sampler),
+                },
+            ],
+            label: Some(texture_bindgroup_label),
+        });
+        diffuse_bind_group
+    }
+
+    pub fn get_texture_from_bytes(
+        device: &wgpu::Device,
+        queue: &wgpu::Queue,
+        texture_bytes: &[u8],
+        texture_name: &str,
+    ) -> Texture {
+        Texture::from_bytes(device, queue, texture_bytes, texture_name).unwrap()
     }
 }

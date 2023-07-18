@@ -123,7 +123,6 @@ impl Vertex {
                         0.0,
                     ],
                     tex_coords: [new_texture_y, new_texture_x],
-                    // tex_coords: [vertex_arr[i].tex_coords[0], vertex_arr[i].tex_coords[1]],
                 }
             })
             .collect::<Vec<_>>();
