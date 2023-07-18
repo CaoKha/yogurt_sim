@@ -21,7 +21,6 @@ pub struct State {
     vertex_buffer: Buffer,
     index_buffer: Option<Buffer>,
     camera_buffer: wgpu::Buffer,
-    // num_vertices: u32,
     num_indices: u32,
     bool_event: bool,
     default_texture: Texture,
@@ -186,12 +185,6 @@ impl State {
                     b: x * y / (self.size.width as f64 * self.size.height as f64),
                     a: 1.0,
                 };
-                // self.clear_color = wgpu::Color {
-                //     r: 0.1,
-                //     g: 0.2,
-                //     b: 0.3,
-                //     a: 1.0,
-                // };
                 true
             }
             _ => false,

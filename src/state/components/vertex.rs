@@ -110,18 +110,16 @@ impl Vertex {
         let challenge_verts = (0..num_vertices)
             .map(|i| {
                 let new_pos_x = angle.cos() * (vertex_arr[i].position[0] - pivot_vertex[0])
-                    + angle.sin() * (vertex_arr[i].position[1] - pivot_vertex[1]) + pivot_vertex[0];
-                let new_pos_y = angle.cos() * (vertex_arr[i].position[1] - pivot_vertex[1])  
-                    - angle.sin() * (vertex_arr[i].position[0] - pivot_vertex[0]) + pivot_vertex[1];
+                    + angle.sin() * (vertex_arr[i].position[1] - pivot_vertex[1])
+                    + pivot_vertex[0];
+                let new_pos_y = angle.cos() * (vertex_arr[i].position[1] - pivot_vertex[1])
+                    - angle.sin() * (vertex_arr[i].position[0] - pivot_vertex[0])
+                    + pivot_vertex[1];
                 let new_texture_x = new_pos_x + 0.5;
                 let new_texture_y = 0.5 - new_pos_y;
 
                 Vertex {
-                    position: [
-                        new_pos_x,
-                        new_pos_y,
-                        0.0,
-                    ],
+                    position: [new_pos_x, new_pos_y, 0.0],
                     tex_coords: [new_texture_y, new_texture_x],
                 }
             })
