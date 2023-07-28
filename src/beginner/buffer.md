@@ -91,7 +91,7 @@ const INDICES: &[u16] = &[
 - When use index buffer, need to use `draw_indexed` function
 
 ### Color Correction
-![Pink Pentagon](assets/images/color_correction.png)
+![Pink Pentagon](../assets/images/color_correction.png)
 - Hex value: `#BC00BC` -> convert RGB: `(188, 0 , 188)` -> divide by 255 -> `(0.737254902, 0, 0.737254902)` -> not the same as our vertex colors which is `(0.5, 0.0, 0.5)`
 - Most monitor use sRGB (depend on what is returned from `surface.get_preferred_format()` using sRGB texture format)
 - to get correct color: `srgb_color = ((rgb_color / 255 + 0.055) / 1.055 ) ^ 2.4`
@@ -124,4 +124,4 @@ const INDICES_STAR: &[u16] = &[
 ];
 ```
 
-![Pink Star](assets/images/star.png)
+![Pink Star](../assets/images/star.png)

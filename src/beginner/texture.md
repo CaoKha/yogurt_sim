@@ -35,7 +35,7 @@ a texture that provides a specific level of detail, such as a particular mipmap 
 By creating texture views with different mipmap levels, developers can control the level of 
 detail used during rendering, balancing visual quality with performance.
 ```
-![Texture Clamping](assets/images/texture.png)
+![Texture Clamping](../assets/images/texture.png)
 ### The BindGroup
 - A `BingGroup` describes a set of resources and how they can be accessed by a shader.
 #### bindgroup_layout

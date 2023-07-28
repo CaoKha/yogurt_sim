@@ -49,6 +49,8 @@ proj = [
     0,                             0,                      -1,                               0
 ]
 ```
+Note:  Each graphics API is different and you should consult the documentation for the graphics API you are using, but in the case of WebGPU, NDC is between (-1, -1, 0) and ( 1, 1, 1).
+WebGL, OpenGL: (-1,-1,-1) to (1,1,1)
 
 
 
