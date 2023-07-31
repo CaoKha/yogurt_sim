@@ -13,14 +13,15 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 cfg-if = "1"
-winit = "0.27"
-env_logger = "0.9"
+winit = "0.28"
+env_logger = "0.10"
 log = "0.4"
 wgpu = "0.16.1"
-pollster = "0.2"
-bytemuck = { version = "1.4", features = ["derive"] }
+pollster = "0.3"
+bytemuck = { version = "1.13", features = ["derive"] }
 anyhow = "1.0"
-bevy = "0.10.1"
+cgmath = "0.18"
+# bevy = "0.10.1"
 
 [dependencies.image]
 version = "0.24"
@@ -31,7 +32,7 @@ features = ["png", "jpeg"]
 # make panic! to JS console
 console_error_panic_hook = "0.1.6"
 # log to JS console
-console_log = "0.2.0"
+console_log = "1.0.0"
 # enable webgl feature on wgpu
 wgpu = { version = "0.16.1", features = ["webgl"] }
 # expose Rust methods that can be used in JS
