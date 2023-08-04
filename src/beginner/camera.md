@@ -578,3 +578,50 @@ w_c
 \\]
 
 More info? Check out at this [References](https://vincent-p.github.io/posts/vulkan_perspective_matrix/)
+
+## The orthographic projection matrix
+- \\(l\\), \\(r\\), \\(t\\) and \\(b\\) which stand for left, right, top, bottom.
+
+We now need to remap the left right screen coordinates (l, r) to -1 and 1 and 
+do the same for bottom and top coordinates.
+\\[ l \le x \le r \\\\ 
+\Leftrightarrow  0 \le x-l \le r-l \\\\
+\Leftrightarrow 0 \le \frac{x-l}{r-l} \le 1 \\\\
+\Leftrightarrow 0 \le 2\frac{x-l}{r-l} \le 2 \\\\
+\Leftrightarrow -1 \le \frac{2x-r-l}{r-l} \le 1 \\\\
+\Leftrightarrow -1 \le \frac{2x}{r-l} - \frac{r+l}{r-l} \le 1
+\\]
+
+We now have the formula to transform x,
+\\[
+x' = \frac{2x}{r-l} - \frac{r+l}{r-l} = \frac{2x}{width}
+\\]
+
+Same with y, we have
+\\[
+y' = \frac{2y}{t-b} - \frac{t+b}{t-b} = \frac{2y}{height}
+\\]
+
+For z in WebGPU, z' in range of [0,1]
+\\[
+n \le z \le f \\\\
+\Leftrightarrow 0 \le z-n \le f-n \\\\
+\Leftrightarrow 0 \le \frac{z-n}{f-n} \le 1
+\\]
+
+Then z' will be:
+\\[
+z' = \frac{z}{f-n} - \frac{n}{f-n}
+\\]
+
+Let the scale be \\( \frac{width}{2}\\).The orthographic projection matrix will be:
+\\[
+\begin{pmatrix}
+{1/\text{scale}} & 0 & 0 & 0\\\\
+0 & {\text{ratio}}/{\text{scale}} & 0 & 0\\\\
+0 & 0 & \frac{1}{f-n} & -\frac{n}{f-n}\\\\
+0 & 0 & 1 & 0
+\end{pmatrix}
+\\]
+
+More info? Check out this [References](https://www.scratchapixel.com/lessons/3d-basic-rendering/perspective-and-orthographic-projection-matrix/orthographic-projection-matrix.html)
