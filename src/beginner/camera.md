@@ -576,3 +576,5 @@ w_c
 \end{pmatrix}
 \end{aligned}
 \\]
+
+More info? Check out at this [References](https://vincent-p.github.io/posts/vulkan_perspective_matrix/)
