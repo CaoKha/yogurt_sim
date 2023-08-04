@@ -7,3 +7,4 @@
     - [Uniform](./beginner/uniform.md)
     - [Swap Chain](./beginner/swap_chain.md)
     - [Render Pipeline](./beginner/renderpipeline.md)
+    - [Camera](./beginner/camera.md)
