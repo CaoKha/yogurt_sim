@@ -620,7 +620,7 @@ Let the scale be \\( \frac{width}{2}\\).The orthographic projection matrix will 
 {1/\text{scale}} & 0 & 0 & 0\\\\
 0 & {\text{ratio}}/{\text{scale}} & 0 & 0\\\\
 0 & 0 & \frac{1}{f-n} & -\frac{n}{f-n}\\\\
-0 & 0 & 1 & 0
+0 & 0 & 0 & 1
 \end{pmatrix}
 \\]
 
