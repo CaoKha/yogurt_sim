@@ -492,3 +492,87 @@ z_c \\\\
 w_c
 \\end{pmatrix}
 \\end{equation}\\\]
+
+It's also easier to reason on the field of view and aspect ratios rather than on the width 
+and the height of the near plane, so let's replace them:
+![focal_length](../assets/images/focal_length.svg)
+Note: In WebGPU, the Z axe is reversed and X point up (height direction)
+
+Let's try to express \\( \frac{2n}{width} \\) and \\( \frac{-2n}{height}\\) in terms of field of view and aspect ratio. (\\( \frac{2n}{width} \\) and \\( \frac{2n}{height}\\) in WebGPU)
+
+<strong>Vulkan:</strong>
+\\[
+\begin{aligned}
+& \tan\left(\frac{fov_y}{2}\right) = \frac{\frac{height}{2}}{n} \\\\
+\Leftrightarrow \quad & 2n \tan\left(\frac{fov_y}{2}\right) = height \\\\
+\Leftrightarrow \quad & \frac{2n}{height} = \frac{1}{\tan\left(\frac{fov_y}{2}\right)}
+\end{aligned}
+\\]
+
+<strong>WebGPU:</strong>
+\\[
+\begin{aligned}
+& \tan\left(\frac{fov_y}{2}\right) = \frac{\frac{width}{2}}{n} \\\\
+\Leftrightarrow \quad & 2n \tan\left(\frac{fov_y}{2}\right) = width \\\\
+\Leftrightarrow \quad & \frac{2n}{width} = \frac{1}{\tan\left(\frac{fov_y}{2}\right)}
+\end{aligned}
+\\]
+
+And finally when replacing in the matrix: <br/>
+<strong>Vulkan:</strong>
+\\[
+\begin{aligned}
+& \text{focal length} =  \frac{1}{\tan\left(\frac{fov_y}{2}\right)}\\\\
+\\\\
+& \text{aspect ratio} =  \frac{width}{height}\\\\
+\\\\
+&
+\begin{pmatrix}
+\frac{\text{focal length}}{\text{aspect ratio}} & 0 & 0 & 0\\\\
+0 & -{\text{focal length}} & 0 & 0\\\\
+0 & 0 & \frac{n}{f-n} & \frac{nf}{f-n}\\\\
+0 & 0 & -1 & 0
+\end{pmatrix}
+\begin{pmatrix}
+x_e \\\\
+y_e \\\\
+z_e \\\\
+1
+\end{pmatrix}=
+\begin{pmatrix}
+x_c \\\\
+y_c \\\\
+z_c \\\\
+w_c
+\end{pmatrix}
+\end{aligned}
+\\]
+
+<strong>WebGPU:</strong>
+\\[
+\begin{aligned}
+& \text{focal length} =  \frac{1}{\tan\left(\frac{fov_y}{2}\right)}\\\\
+\\\\
+& \text{aspect ratio} =  \frac{width}{height}\\\\
+\\\\
+&
+\begin{pmatrix}
+{\text{focal length}} & 0 & 0 & 0\\\\
+0 & {\text{focal length}} \times {\text{aspect ratio}} & 0 & 0\\\\
+0 & 0 & \frac{f}{f-n} & -\frac{nf}{f-n}\\\\
+0 & 0 & 1 & 0
+\end{pmatrix}
+\begin{pmatrix}
+x_e \\\\
+y_e \\\\
+z_e \\\\
+1
+\end{pmatrix}=
+\begin{pmatrix}
+x_c \\\\
+y_c \\\\
+z_c \\\\
+w_c
+\end{pmatrix}
+\end{aligned}
+\\]
