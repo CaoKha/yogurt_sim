@@ -101,3 +101,12 @@ fn init_render_pipeline(
 ### Shader WGSL file notes:
 - bitwise operator `&`: and
 - 1u = 1 unsigned = 0b0001
+
+### Basic shading theory
+
+#### Normal
+The normals can be mathematically computed (using the cross product of two sides of the triangles), 
+but it is common to <strong>store them in the 3D file</strong> format, because sometimes we use 
+intentionally fake normals to give the feeling that triangles are slightly curved.
+
+
